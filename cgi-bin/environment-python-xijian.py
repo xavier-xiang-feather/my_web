@@ -8,7 +8,7 @@ print("<h1>Environment Variables</h1>")
 print("<ul>")
 
 for key, value in sorted(os.environ.items()):
-    print(f"<li>strong>{key}</strong>: {value}</li>")
+    print(f"<li><strong>{key}</strong>: {value}</li>")
 
 print("</ul>")
 print("</body></html>")
