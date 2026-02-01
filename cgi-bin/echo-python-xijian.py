@@ -33,9 +33,16 @@ if method == "GET":
     parsed = urllib.parse.parse_qs(query_string)
     body = ""
     body_mode = "n/a"
-else:
+
+elif method in ("POST", "PUT", "DELETE"):
     body = read_body()
     parsed, body_mode = parse_body(content_type, body)
+
+else:
+    body = ""
+    parsed = {}
+    body_mode = "unsupported"
+
 
 # ---- output HTML like the instructor demo ----
 print("Content-Type: text/html")
