@@ -7,7 +7,6 @@ static const char* env_or(const char* key, const char* fallback) {
     return (v && v[0]) ? v : fallback;
 }
 
-// minimal JSON escape (enough for IP/time)
 static void json_escape(const char* s) {
     for (; *s; s++) {
         unsigned char c = (unsigned char)*s;
@@ -31,10 +30,10 @@ int main(void) {
     printf("Content-Type: application/json\r\n\r\n");
 
     printf("{\n");
-    printf("  \"greeting\": \"Hello, World!\",\n");
-    printf("  \"from\": \"greeting from Xijian Xiang\",\n");
-    printf("  \"Generated at\": \""); json_escape(current); printf("\",\n");
-    printf("  \"IP Address\": \""); json_escape(ip_addr); printf("\"\n");
+    printf("\"greeting\": \"Hello, World!\",\n");
+    printf("\"from\": \"greeting from Xijian Xiang\",\n");
+    printf("\"Generated at\": \""); json_escape(current); printf("\",\n");
+    printf("\"IP Address\": \""); json_escape(ip_addr); printf("\"\n");
     printf("}\n");
 
     return 0;
