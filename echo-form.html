@@ -39,44 +39,61 @@
   </form>
 
   <script>
-    document.getElementById("echoForm").addEventListener("submit", function (e) {
-      e.preventDefault();
+  document.getElementById("echoForm").addEventListener("submit", function (e) {
+    e.preventDefault();
 
-      const lang = document.getElementById("language").value;
-      const method = document.getElementById("method").value;
-      const encoding = document.getElementById("encoding").value;
-      const message = document.getElementById("message").value;
-      const count = document.getElementById("count").value;
+    const lang = document.getElementById("language").value;
+    const method = document.getElementById("method").value;
+    const encoding = document.getElementById("encoding").value;
+    const message = document.getElementById("message").value;
+    const count = document.getElementById("count").value;
 
-      const endpoints = {
+    const endpoints = {
       python: "/cgi-bin/echo-python-xijian.py",
       php:    "/cgi-bin/echo-php-xijian.php",
-      c:      "/cgi-bin/echo-c-xijian"   
+      c:      "/cgi-bin/echo-c-xijian"
     };
 
-      let headers = {};
-      let body = null;
-      let url = endpoint;
+    const endpoint = endpoints[lang];
+    if (!endpoint) {
+      alert("Unknown language: " + lang);
+      return;
+    }
 
-      if (method === "GET") {
-        url += `?message=${encodeURIComponent(message)}&count=${count}`;
+    let headers = {};
+    let body = null;
+    let url = endpoint;
+
+    if (method === "GET") {
+      url += `?message=${encodeURIComponent(message)}&count=${encodeURIComponent(count)}`;
+    } else {
+      if (encoding === "json") {
+        headers["Content-Type"] = "application/json";
+        body = JSON.stringify({ message, count });
       } else {
-        if (encoding === "json") {
-          headers["Content-Type"] = "application/json";
-          body = JSON.stringify({ message, count });
-        } else {
-          headers["Content-Type"] = "application/x-www-form-urlencoded";
-          body = `message=${encodeURIComponent(message)}&count=${count}`;
-        }
+        headers["Content-Type"] = "application/x-www-form-urlencoded";
+        body = `message=${encodeURIComponent(message)}&count=${encodeURIComponent(count)}`;
       }
+    }
 
-      fetch(url, { method, headers, body })
-        .then(res => res.text())
-        .then(text => {
-          const w = window.open();
-          w.document.write(text);
-        });
-    });
-  </script>
+    fetch(url, { method, headers, body })
+      .then(res => res.text())
+      .then(text => {
+        const w = window.open("", "_blank");
+        if (!w) {
+          alert("Popup 被浏览器拦截了：请允许弹窗，或我可以改成在本页显示结果。");
+          return;
+        }
+        w.document.open();
+        w.document.write(text);
+        w.document.close();
+      })
+      .catch(err => {
+        alert("Fetch error: " + err);
+        console.error(err);
+      });
+  });
+</script>
+
 </body>
 </html>
