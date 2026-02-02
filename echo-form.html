@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Echo Form Tester</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      max-width: 700px;
+      margin: 40px auto;
+    }
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+    select, input, textarea, button {
+      width: 100%;
+      padding: 6px;
+      margin-top: 5px;
+    }
+    button {
+      margin-top: 20px;
+    }
+  </style>
+</head>
+<body>
+
+<h1>Echo Form Test</h1>
+<p>
+  This form is used to test different <code>echo-language-name</code> CGI programs.
+</p>
+
+<form id="echoForm" method="GET" action="/cgi-bin/echo-python-xijian.py">
+
+  <!-- Language selection -->
+  <label for="language">Language</label>
+  <select id="language">
+    <option value="python">Python</option>
+    <option value="php">PHP</option>
+    <option value="c">C</option>
+  </select>
+
+  <!-- HTTP method -->
+  <label for="method">HTTP Method</label>
+  <select id="method">
+    <option>GET</option>
+    <option>POST</option>
+    <option>PUT</option>
+    <option>DELETE</option>
+  </select>
+
+  <!-- Encoding -->
+  <label for="encoding">Encoding</label>
+  <select id="encoding">
+    <option value="application/x-www-form-urlencoded">
+      x-www-form-urlencoded
+    </option>
+    <option value="application/json">
+      application/json
+    </option>
+  </select>
+
+  <!-- Fields -->
+  <label for="message">Message</label>
+  <input type="text" name="message" id="message" value="Hello Echo">
+
+  <label for="count">Count</label>
+  <input type="number" name="count" id="count" value="1">
+
+  <button type="submit">Send Request</button>
+</form>
+
+<script>
+  const form = document.getElementById("echoForm");
+  const language = document.getElementById("language");
+  const method = document.getElementById("method");
+  const encoding = document.getElementById("encoding");
+
+  function updateForm() {
+    // choose endpoint
+    let endpoint = "/cgi-bin/echo-python-xijian.py";
+    if (language.value === "php") {
+      endpoint = "/cgi-bin/echo-php-xijian.php";
+    } else if (language.value === "c") {
+      endpoint = "/cgi-bin/echo-c-xijian.cgi";
+    }
+
+    form.action = endpoint;
+    form.method = method.value;
+    form.enctype = encoding.value;
+  }
+
+  language.addEventListener("change", updateForm);
+  method.addEventListener("change", updateForm);
+  encoding.addEventListener("change", updateForm);
+
+  // initialize on load
+  updateForm();
+</script>
+
+<noscript>
+  <p>
+    JavaScript is disabled.  
+    The form will submit using default GET and Python echo.
+  </p>
+</noscript>
+
+</body>
+</html>
