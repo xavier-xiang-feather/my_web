@@ -1,7 +1,12 @@
-CC=gcc
-CFLAGS=-O2 -Wall -Wextra
+CC = gcc
+CFLAGS = -O2 -Wall -Wextra
 
-all: hello-html-c-xijian hello-json-c-xijian environment-c-xijian echo-c-xijian
+all: \
+	hello-html-c-xijian \
+	hello-json-c-xijian \
+	environment-c-xijian \
+	echo-c-xijian \
+	state-c-xijian
 
 hello-html-c-xijian: hello-html-C-xijian.c
 	$(CC) $(CFLAGS) -o $@ $<
@@ -15,5 +20,13 @@ environment-c-xijian: environment-C-xijian.c
 echo-c-xijian: echo-C-xijian.c
 	$(CC) $(CFLAGS) -o $@ $<
 
+state-c-xijian: state-C-xijian.c
+	$(CC) $(CFLAGS) -o $@ $<
+
 clean:
-	rm -f hello-html-c-xijian hello-json-c-xijian environment-c-xijian echo-c-xijian
+	rm -f \
+		hello-html-c-xijian \
+		hello-json-c-xijian \
+		environment-c-xijian \
+		echo-c-xijian \
+		state-c-xijian
