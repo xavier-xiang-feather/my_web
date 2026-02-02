@@ -3,6 +3,17 @@
 
 <head>
   <meta charset="UTF-8"/>
+  <!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-MWSDGT59KQ"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-MWSDGT59KQ');
+</script>
+
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>CSE 135 HW Lives!</title>
   <link rel="icon" href="/favicon.ico" />
@@ -36,13 +47,33 @@
     }
     .bar {
       background: lightgrey;
-      width: 100%;
+      width: auto;
       padding: 10px 10px;
       border-radius: 4px;
       min-height: 34px;
       display: flex;
       align-items: center;
     }
+    .hw2 {
+      display: flex;
+      gap: 20px;
+    }
+
+    .hw2 .bar {
+      flex: 1;
+    }
+
+    .bar ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+
+    .bar li:first-child {
+      font-weight: bold;
+      margin-bottom: 6px;
+    }
+
   </style>
 </head>
 
@@ -80,41 +111,44 @@
 
     <h2>Homework 2</h2>
     <div class = "bar">
-      <ul>
-        <li><a href="echo-form.html">Echo form </a></li>
-      </ul>
-    </div>
-    <div class = "bar">
-      <ul>
-        <li>Python:</li>
-        <li><a href="/cgi-bin/hello-html-python-xijian.py">Hello HTML</a></li>
-        <li><a href="/cgi-bin/hello-json-python-xijian.py">Hello JSON</a></li>
-        <li><a href="/cgi-bin/environment-python-xijian.py">Environment</a></li>
-        <li><a href="/cgi-bin/echo-python-xijian.py">Echo</a></li>
-        <li><a href="/cgi-bin/state-python-xijian.py">Set State</a></li>
-      </ul>
-    </div>
+        <ul>
+          <li><a href="echo-form.html">Echo form </a></li>
+        </ul>
+      </div>
+    <div class = "hw2">
+      
+      <div class = "bar">
+        <ul>
+          <li>Python:</li>
+          <li><a href="/cgi-bin/hello-html-python-xijian.py">Hello HTML</a></li>
+          <li><a href="/cgi-bin/hello-json-python-xijian.py">Hello JSON</a></li>
+          <li><a href="/cgi-bin/environment-python-xijian.py">Environment</a></li>
+          <li><a href="/cgi-bin/echo-python-xijian.py">Echo</a></li>
+          <li><a href="/cgi-bin/state-python-xijian.py">State</a></li>
+        </ul>
+      </div>
 
-    <div class = "bar">
-      <ul>
-        <li>C:</li>
-        <li><a href="/cgi-bin/hello-html-c-xijian">Hello HTML</a></li>
-        <li><a href="/cgi-bin/hello-json-c-xijian">Hello JSON</a></li>
-        <li><a href="/cgi-bin/environment-c-xijian">Environment</a></li>
-        <li><a href="/cgi-bin/echo-c-xijian">Echo</a></li>
-        <li><a href="/cgi-bin/state-c-xijian">State</a></li>
-      </ul>
-    </div>
+      <div class = "bar">
+        <ul>
+          <li>C:</li>
+          <li><a href="/cgi-bin/hello-html-c-xijian">Hello HTML</a></li>
+          <li><a href="/cgi-bin/hello-json-c-xijian">Hello JSON</a></li>
+          <li><a href="/cgi-bin/environment-c-xijian">Environment</a></li>
+          <li><a href="/cgi-bin/echo-c-xijian">Echo</a></li>
+          <li><a href="/cgi-bin/state-c-xijian">State</a></li>
+        </ul>
+      </div>
 
-    <div class = "bar">
-      <ul>
-        <li>PHP:</li>
-        <li><a href="/php/hello-html-php-xijian.php">Hello HTML</a></li>
-        <li><a href="/php/hello-json-php-xijian.php">Hello JSON</a></li>
-        <li><a href="/php/environment-php-xijian.php">Environment</a></li>
-        <li><a href="/php/echo-php-xijian.php">Echo</a></li>
-        <li><a href="/php/state-php-xijian.php">State</a></li>
-      </ul>
+      <div class = "bar">
+        <ul>
+          <li>PHP:</li>
+          <li><a href="/php/hello-html-php-xijian.php">Hello HTML</a></li>
+          <li><a href="/php/hello-json-php-xijian.php">Hello JSON</a></li>
+          <li><a href="/php/environment-php-xijian.php">Environment</a></li>
+          <li><a href="/php/echo-php-xijian.php">Echo</a></li>
+          <li><a href="/php/state-php-xijian.php">State</a></li>
+        </ul>
+      </div>
     </div>
 
     
