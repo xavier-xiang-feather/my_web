@@ -80,10 +80,7 @@
       .then(res => res.text())
       .then(text => {
         const w = window.open("", "_blank");
-        if (!w) {
-          alert("Popup 被浏览器拦截了：请允许弹窗，或我可以改成在本页显示结果。");
-          return;
-        }
+        
         w.document.open();
         w.document.write(text);
         w.document.close();
