@@ -35,7 +35,6 @@ static char* read_body(void) {
 }
 
 int main(void) {
-    // ---- basic request info ----
     const char* protocol = env_or("SERVER_PROTOCOL", "HTTP/1.1");
     const char* method = env_or("REQUEST_METHOD", "UNKNOWN");
     const char* query_string = env_or("QUERY_STRING", "");
@@ -47,13 +46,12 @@ int main(void) {
     char current[64];
     strftime(current, sizeof(current), "%Y-%m-%d %H:%M:%S", localtime(&now));
 
-    // ---- read/parse data ----
+    // read and parse data
     char* body = NULL;
     const char* body_mode = NULL;
 
-    // we will set "parsed" as a string for display (closest to your output shape)
-    // For GET: parsed is query_string
-    // For others: parsed is body
+    // for get: parsed is query_string
+    // for others: parsed is body
     const char* parsed = NULL;
 
     if (strcmp(method, "GET") == 0) {
@@ -74,7 +72,6 @@ int main(void) {
         body_mode = "unsupported";
     }
 
-    // ---- output HTML like the instructor demo ----
     printf("Content-Type: text/html\r\n\r\n");
 
     printf("<!doctype html>");

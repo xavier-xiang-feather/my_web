@@ -1,5 +1,4 @@
 <?php
-// state-php-xijian.php
 session_start();
 header("Content-Type: text/html; charset=utf-8");
 
@@ -26,18 +25,15 @@ function clear_session() {
 
 $saved = $_SESSION["name"] ?? "";
 
-// ---- handle POST for set ----
 if ($action === "set" && $_SERVER["REQUEST_METHOD"] === "POST") {
   $name = $_POST["name"] ?? "";
   $_SESSION["name"] = $name;
   $saved = $name;
 }
 
-// ---- handle clear ----
 if ($action === "clear") {
   clear_session();
-  // After destroy, session_id() becomes empty unless session_start again.
-  // For display clarity, restart a new session automatically.
+  
   session_start();
   $sid = session_id();
   $saved = $_SESSION["name"] ?? "";

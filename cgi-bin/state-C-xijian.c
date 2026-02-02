@@ -6,8 +6,7 @@
 
 #define BUF 1024
 
-/* -------- helpers -------- */
-
+//helper
 void get_session_id(char *sid, size_t n) {
     char *cookie = getenv("HTTP_COOKIE");
     if (!cookie) { sid[0] = '\0'; return; }
@@ -49,7 +48,6 @@ char *get_query_param(const char *qs, const char *key) {
     return val;
 }
 
-/* -------- main -------- */
 
 int main(void) {
     char session_id[128];
@@ -73,7 +71,6 @@ int main(void) {
     char path[256];
     snprintf(path, sizeof(path), "/tmp/state_c_%s.txt", session_id);
 
-    /* -------- SET -------- */
     if (strcmp(action, "set") == 0) {
         char *method = getenv("REQUEST_METHOD");
 
@@ -108,7 +105,6 @@ int main(void) {
         );
     }
 
-    /* -------- VIEW -------- */
     else if (strcmp(action, "view") == 0) {
         char value[BUF] = "(no state saved)";
         FILE *f = fopen(path, "r");
@@ -126,7 +122,6 @@ int main(void) {
         );
     }
 
-    /* -------- CLEAR -------- */
     else if (strcmp(action, "clear") == 0) {
         unlink(path);
 
@@ -138,7 +133,7 @@ int main(void) {
         );
     }
 
-    /* -------- DEFAULT -------- */
+    //default
     else {
         printf(
             "<h1>C State Demo</h1>"

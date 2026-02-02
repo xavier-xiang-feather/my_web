@@ -24,10 +24,10 @@ int main(void) {
     printf("<ul>");
 
     for (char **e = environ; *e; e++) {
-        // each entry is KEY=VALUE
+        // key value
         const char* kv = *e;
 
-        // split at first '='
+        // split at first =
         const char* eq = kv;
         while (*eq && *eq != '=') eq++;
 

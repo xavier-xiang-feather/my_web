@@ -19,7 +19,6 @@ def parse_body(content_type, body):
     # default: x-www-form-urlencoded
     return urllib.parse.parse_qs(body), "form"
 
-# ---- basic request info ----
 protocol = os.environ.get("SERVER_PROTOCOL", "HTTP/1.1")
 method = os.environ.get("REQUEST_METHOD", "UNKNOWN")
 query_string = os.environ.get("QUERY_STRING", "")
@@ -28,7 +27,7 @@ ip = os.environ.get("REMOTE_ADDR", "unknown")
 user_agent = os.environ.get("HTTP_USER_AGENT", "unknown")
 current = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-# ---- read/parse data ----
+# read and parse data
 if method == "GET":
     parsed = urllib.parse.parse_qs(query_string)
     body = ""
@@ -44,7 +43,6 @@ else:
     body_mode = "unsupported"
 
 
-# ---- output HTML like the instructor demo ----
 print("Content-Type: text/html")
 print()
 

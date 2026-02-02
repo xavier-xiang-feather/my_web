@@ -4,8 +4,7 @@ import json
 import uuid
 import urllib.parse
 
-# ---------- helpers ----------
-
+#helper
 def get_session_id():
     cookies = os.environ.get("HTTP_COOKIE", "")
     for c in cookies.split(";"):
@@ -20,7 +19,6 @@ def print_headers(set_cookie=None):
         print(f"Set-Cookie: session_id={set_cookie}; Path=/")
     print()
 
-# ---------- session ----------
 
 session_id = get_session_id()
 new_session = False
@@ -31,7 +29,6 @@ if not session_id:
 
 state_file = f"/tmp/state_python_{session_id}.json"
 
-# ---------- routing ----------
 
 query = os.environ.get("QUERY_STRING", "")
 params = urllib.parse.parse_qs(query)
@@ -39,7 +36,6 @@ action = params.get("action", [""])[0]
 
 method = os.environ.get("REQUEST_METHOD", "GET")
 
-# ---------- handle SET (POST) ----------
 
 if action == "set" and method == "POST":
     length = int(os.environ.get("CONTENT_LENGTH", "0") or "0")
@@ -50,14 +46,12 @@ if action == "set" and method == "POST":
     with open(state_file, "w") as f:
         json.dump({"name": name}, f)
 
-# ---------- handle CLEAR ----------
 
 if action == "clear":
     if os.path.exists(state_file):
         os.remove(state_file)
 
-# ---------- load state ----------
-
+# load
 state = {}
 if os.path.exists(state_file):
     try:
@@ -68,7 +62,6 @@ if os.path.exists(state_file):
 
 saved_name = state.get("name", "")
 
-# ---------- output ----------
 
 print_headers(session_id if new_session else None)
 
@@ -77,7 +70,6 @@ print("<html><head><meta charset='utf-8'>")
 print("<title>Python State Demo</title>")
 print("</head><body>")
 
-# ---------- MAIN ----------
 
 if action == "":
     print("<h1>Python State Demo</h1>")
@@ -87,7 +79,6 @@ if action == "":
     print("<li><a href='?action=clear'>Clear State</a></li>")
     print("</ul>")
 
-# ---------- SET ----------
 
 elif action == "set":
     print("<h1>Set State (Python)</h1>")
@@ -103,7 +94,6 @@ elif action == "set":
     print("<p><a href='?action=clear'>Clear State</a></p>")
     print("<p><a href='?'>Home</a></p>")
 
-# ---------- VIEW ----------
 
 elif action == "view":
     print("<h1>View State (Python)</h1>")
@@ -114,7 +104,6 @@ elif action == "view":
     print("<p><a href='?action=clear'>Clear State</a></p>")
     print("<p><a href='?'>Home</a></p>")
 
-# ---------- CLEAR ----------
 
 elif action == "clear":
     print("<h1>State Cleared (Python)</h1>")
@@ -123,7 +112,6 @@ elif action == "clear":
     print("<p><a href='?action=view'>View State</a></p>")
     print("<p><a href='?'>Home</a></p>")
 
-# ---------- FALLBACK ----------
 
 else:
     print("<h1>Unknown action</h1>")

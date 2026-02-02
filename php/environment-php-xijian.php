@@ -12,7 +12,7 @@ header("Content-Type: text/html; charset=utf-8");
   <h1>Environment Variables</h1>
   <ul>
     <?php
-      $env = $_SERVER;           // CGI-like variables + headers
+      $env = $_SERVER;           
       ksort($env);
       foreach ($env as $key => $value) {
         if (is_array($value)) $value = json_encode($value);
