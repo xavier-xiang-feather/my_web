@@ -22,9 +22,24 @@ jobs:
           chmod 600 ~/.ssh/id_ed25519
           ssh-keyscan -H ${{ secrets.DO_HOST }} >> ~/.ssh/known_hosts
 
-      - name: Deploy (rsync to server)
+      # ----------------------------
+      # Deploy main site (mrxijian.site)
+      # ----------------------------
+      - name: Deploy main site
         run: |
           rsync -avz --delete \
             --exclude ".git/" \
             --exclude ".github/" \
-            ./ ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:${{ secrets.DO_TARGET }}
+            main_site/ \
+            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/mrxijian.site/public_html/
+
+      # ----------------------------
+      # Deploy collector site (collector.mrxijian.site)
+      # ----------------------------
+      - name: Deploy collector site
+        run: |
+          rsync -avz --delete \
+            --exclude ".git/" \
+            --exclude ".github/" \
+            collector_site/ \
+            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/collector.mrxijian.site/public_html/
