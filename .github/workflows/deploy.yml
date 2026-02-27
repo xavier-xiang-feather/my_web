@@ -43,3 +43,12 @@ jobs:
             --exclude ".github/" \
             collector_site/ \
             ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/collector.mrxijian.site/public_html/
+
+      #Deploy reporting site
+      - name: Deploy reporting site
+        run: |
+          rsync -avz --delete \
+            --exclude ".git/" \
+            --exclude ".github/" \
+            reporting_site/ \
+            ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/reporting.mrxijian.site/public_html/
