@@ -7,7 +7,8 @@ ALLOWED_ORIGINS = {
     "https://mrxijian.site",
 }
 
-LOG_PATH = "/tmp/cse135-collector.log"
+#LOG_PATH = "/tmp/cse135-collector.log"
+LOG_PATH = "/var/www/collector.mrxijian.site/logs/collector.log"
 VERSION = "collector-cgi-v4"
 
 def _origin_headers():
