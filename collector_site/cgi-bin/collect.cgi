@@ -7,7 +7,7 @@ ALLOWED_ORIGINS = {
     "https://mrxijian.site",
 }
 
-LOG_PATH = "/var/www/collector.mrxijian.site/logs/collector.log"
+LOG_PATH = "/tmp/cse135-collector.log"
 VERSION = "collector-cgi-v4"
 
 def _origin_headers():
@@ -89,8 +89,6 @@ def main():
             "payload": payload,
         }
 
-        print(f"DEBUG: Attempting to write to {LOG_PATH}", file=sys.stderr)
-        
         with open(LOG_PATH, "a", encoding="utf-8") as f:
             f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
