@@ -1,10 +1,11 @@
 RewriteEngine On
-RewriteBase /api/static/
 
-# 真实存在的文件/目录就直接访问（例如你以后放文档）
-RewriteCond %{REQUEST_FILENAME} -f [OR]
-RewriteCond %{REQUEST_FILENAME} -d
-RewriteRule ^ - [L]
-
-# 其他全部交给 index.php
+# 允许所有方法进入 index.php
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
+
+# 显式允许 REST 方法
+<LimitExcept GET POST PUT DELETE OPTIONS>
+  Require all denied
+</LimitExcept>
