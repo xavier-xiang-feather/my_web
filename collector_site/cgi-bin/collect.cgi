@@ -1,9 +1,15 @@
+
 #!/usr/bin/env python3
 import os, sys, json, datetime
 
 def respond(status="204 No Content"):
     print(f"Status: {status}")
-    print("Access-Control-Allow-Origin: *")
+    origin = os.environ.get("HTTP_ORIGIN", "")
+    if origin:
+        print(f"Access-Control-Allow-Origin: {origin}")
+    else:
+        print("Access-Control-Allow-Origin: https://test.mrxijian.site")
+    print("Access-Control-Allow-Credentials: true")
     print("Access-Control-Allow-Methods: POST, OPTIONS")
     print("Access-Control-Allow-Headers: Content-Type")
     print()
@@ -53,5 +59,3 @@ def main():
 
     respond("204 No Content")
 
-if __name__ == "__main__":
-    main()
