@@ -25,11 +25,7 @@ def respond(status="204 No Content"):
     print()
 
 def read_body():
-    try:
-        length = int(os.environ.get("CONTENT_LENGTH", "0") or "0")
-    except ValueError:
-        length = 0
-    raw = sys.stdin.buffer.read(length) if length > 0 else b""
+    raw = sys.stdin.buffer.read()
     return raw.decode("utf-8", errors="replace")
 
 def main():
