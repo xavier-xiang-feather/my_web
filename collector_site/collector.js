@@ -1,22 +1,13 @@
-/**
- * collector.js — CSE135 Part 3
- * Based on tutorial style: sessionStorage SID + sendBeacon + feature detection
- * Adds: activity, errors, idle (>=2s), enter/leave, page info
- */
+
 (function () {
   'use strict';
-
-  // ====== CONFIG ======
-  // Your collector endpoint (POST target)
   const ENDPOINT = 'https://collector.mrxijian.site/cgi-bin/collect.cgi';
 
-  // Throttles (reduce spam)
   const MOUSE_THROTTLE_MS = 250;
   const SCROLL_THROTTLE_MS = 250;
   const IDLE_THRESHOLD_MS = 2000;
   const IDLE_CHECK_MS = 500;
 
-  // ====== SESSION ID (tutorial style) ======
   function getSessionId() {
     let sid = sessionStorage.getItem('_collector_sid');
     if (!sid) {
@@ -26,7 +17,6 @@
     return sid;
   }
 
-  // ====== NETWORK INFO (tutorial style) ======
   function getNetworkInfo() {
     if (!('connection' in navigator)) return {};
     const conn = navigator.connection;
@@ -38,7 +28,6 @@
     };
   }
 
-  // ====== TECHNOGRAPHICS / STATIC (tutorial style) ======
   function getTechnographics() {
     return {
       userAgent: navigator.userAgent,
@@ -62,7 +51,7 @@
     };
   }
 
-  // ====== PERFORMANCE (tutorial style) ======
+  // round a number to two decimal places
   function round(n) {
     return Math.round(n * 100) / 100;
   }
@@ -114,7 +103,6 @@
     };
   }
 
-  // ====== SEND (tutorial style, with fetch fallback) ======
   function send(payload) {
     const blob = new Blob([JSON.stringify(payload)], { type: 'application/json' });
 
@@ -124,15 +112,13 @@
       fetch(ENDPOINT, { method: 'POST', body: blob, keepalive: true }).catch(() => {});
     }
 
-    // optional debug:
-    // console.log('[collector] sent:', payload);
+
     window.dispatchEvent(new CustomEvent('collector:payload', { detail: payload }));
   }
 
-  // ====== Base payload (keeps things consistent) ======
   function basePayload(kind) {
     return {
-      kind, // "enter"|"leave"|"static"|"performance"|"activity"|"error"
+      kind, 
       url: window.location.href,
       title: document.title,
       referrer: document.referrer,
@@ -145,12 +131,10 @@
     };
   }
 
-  // ====== STATIC (after load) ======
   function collectStatic() {
     const payload = basePayload('static');
     payload.technographics = getTechnographics();
 
-    // “allows JS/images/CSS” is not truly detectable; best-effort:
     payload.capabilities = {
       jsEnabled: true,
       imagesEnabled: true,
@@ -160,13 +144,11 @@
     send(payload);
   }
 
-  // ====== PERFORMANCE (after load) ======
   function collectPerformance() {
     const payload = basePayload('performance');
     payload.timing = getNavigationTiming();
     payload.resources = getResourceSummary();
 
-    // Manual total load time (ms) if loadEvent exists
     if (payload.timing && typeof payload.timing.loadEvent === 'number') {
       payload.totalLoadTimeMs = Math.round(payload.timing.loadEvent);
     }
@@ -174,7 +156,6 @@
     send(payload);
   }
 
-  // ====== ENTER / LEAVE ======
   function collectEnter() {
     const payload = basePayload('enter');
     send(payload);
@@ -185,7 +166,7 @@
     send(payload);
   }
 
-  // ====== ACTIVITY ======
+  //collect acitivity
   let lastMouseSent = 0;
   let lastScrollSent = 0;
 
@@ -195,7 +176,7 @@
     send(payload);
   }
 
-  // ====== IDLE (>=2 seconds no activity) ======
+  //idle 2 seconds
   let lastActivityAt = Date.now();
   let idleActive = false;
   let idleStartAt = null;
@@ -224,19 +205,15 @@
     }
   }
 
-  // ====== ERRORS ======
   function collectError(type, data) {
     const payload = basePayload('error');
     payload.error = { type, ...data };
     send(payload);
   }
 
-  // ====== EVENT HOOKS ======
   window.addEventListener('load', () => {
-    // enter beacon early is ok too, but we do it here + keep tutorial style
     collectEnter();
 
-    // performance timing may need loadEventEnd populated, so keep tutorial’s setTimeout(0)
     setTimeout(() => {
       collectStatic();
       collectPerformance();
@@ -249,7 +226,6 @@
     }
   });
 
-  // mouse move (throttled)
   document.addEventListener('mousemove', (e) => {
     markActive();
     const now = Date.now();
@@ -259,13 +235,11 @@
     collectActivity('mousemove', { x: e.clientX, y: e.clientY });
   }, { passive: true });
 
-  // click
   document.addEventListener('click', (e) => {
     markActive();
     collectActivity('click', { x: e.clientX, y: e.clientY, button: e.button });
   }, { passive: true });
 
-  // scroll (throttled)
   window.addEventListener('scroll', () => {
     markActive();
     const now = Date.now();
@@ -275,7 +249,6 @@
     collectActivity('scroll', { scrollX: window.scrollX, scrollY: window.scrollY });
   }, { passive: true });
 
-  // keyboard
   document.addEventListener('keydown', (e) => {
     markActive();
     collectActivity('keydown', { key: e.key, code: e.code || null });
@@ -297,10 +270,9 @@
     collectError('unhandledrejection', { reason: String(ev.reason) });
   });
 
-  // idle checker
+  
   setInterval(idleLoop, IDLE_CHECK_MS);
 
-  // ====== Expose for testing (tutorial style) ======
   window.__collector = {
     getSessionId,
     getNetworkInfo,
