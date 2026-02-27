@@ -1,29 +1,25 @@
 #!/usr/bin/env python3
 import os, sys, json, datetime
 
-# 只允许哪些站点可以跨域打你的 collector（按你需要增删）
 ALLOWED_ORIGINS = {
     "https://test.mrxijian.site",
     "https://mrxijian.site",
-    # 如果你还有其他页面也要打 collector，就继续加：
-    # "https://reporting.mrxijian.site",
 }
 
-LOG_PATH_PRIMARY = "/var/log/cse135-collector.log"
-LOG_PATH_FALLBACK = "/tmp/cse135-collector.log"
+LOG_PATH = "/tmp/cse135-collector.log"   # 固定写这里，避免权限坑
+VERSION = "collector-cgi-v3"
 
 def respond(status="204 No Content"):
     print(f"Status: {status}")
     print("Content-Type: text/plain; charset=utf-8")
+    print(f"X-Collector-Version: {VERSION}")
 
     origin = os.environ.get("HTTP_ORIGIN", "")
-    # 关键：如果浏览器 credentials=include，就不能用 "*"
     if origin in ALLOWED_ORIGINS:
         print(f"Access-Control-Allow-Origin: {origin}")
         print("Access-Control-Allow-Credentials: true")
-        print("Vary: Origin")  # 防止缓存把别的 origin 的结果复用
+        print("Vary: Origin")
 
-    # preflight / 实际请求都给
     print("Access-Control-Allow-Methods: POST, OPTIONS")
     print("Access-Control-Allow-Headers: Content-Type")
     print()
@@ -36,19 +32,9 @@ def read_body():
     raw = sys.stdin.buffer.read(length) if length > 0 else b""
     return raw.decode("utf-8", errors="replace")
 
-def append_log(line: str):
-    try:
-        with open(LOG_PATH_PRIMARY, "a", encoding="utf-8") as f:
-            f.write(line)
-        return
-    except Exception:
-        with open(LOG_PATH_FALLBACK, "a", encoding="utf-8") as f:
-            f.write(line)
-
 def main():
     method = os.environ.get("REQUEST_METHOD", "GET").upper()
 
-    # 处理 CORS preflight
     if method == "OPTIONS":
         respond("204 No Content")
         return
@@ -73,7 +59,9 @@ def main():
         "payload": payload,
     }
 
-    append_log(json.dumps(record, ensure_ascii=False) + "\n")
+    # 关键：固定写到 /tmp/cse135-collector.log
+    with open(LOG_PATH, "a", encoding="utf-8") as f:
+        f.write(json.dumps(record, ensure_ascii=False) + "\n")
 
     respond("204 No Content")
 
