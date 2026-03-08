@@ -2,12 +2,20 @@
 require_once __DIR__ . '/includes/auth.php';
 require_login();
 
-require_once __DIR__ . '/includes/db.php';
+$dbConfig = require __DIR__ . '/db.php';
 
-// 查询最近 50 条数据
-$sql = "SELECT * FROM mrxijian_events ORDER BY id DESC LIMIT 50";
-$stmt = $pdo->query($sql);
-$rows = $stmt->fetchAll();
+try {
+    $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
+    $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass']);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+    $sql = "SELECT * FROM mrxijian_events ORDER BY id DESC LIMIT 50";
+    $stmt = $pdo->query($sql);
+    $rows = $stmt->fetchAll();
+} catch (PDOException $e) {
+    die("Database error: " . htmlspecialchars($e->getMessage()));
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
