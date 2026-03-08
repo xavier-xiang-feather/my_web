@@ -9,14 +9,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
 
     //debug purpose
-    echo 'username input: [' . htmlspecialchars($username) . ']<br>';
-    echo 'password input: [' . htmlspecialchars($password) . ']<br>';
-    echo 'APP_USERNAME: [' . htmlspecialchars(APP_USERNAME) . ']<br>';
-    echo 'APP_PASSWORD: [' . htmlspecialchars(APP_PASSWORD) . ']<br>';
+    // echo 'username input: [' . htmlspecialchars($username) . ']<br>';
+    // echo 'password input: [' . htmlspecialchars($password) . ']<br>';
+    // echo 'APP_USERNAME: [' . htmlspecialchars(APP_USERNAME) . ']<br>';
+    // echo 'APP_PASSWORD: [' . htmlspecialchars(APP_PASSWORD) . ']<br>';
 
     if (
         $username === APP_USERNAME &&
-        password_verify($password, APP_PASSWORD_HASH)
+        //password_verify($password, APP_PASSWORD_HASH)
+        $password === APP_PASSWORD
     ) {
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $username;
