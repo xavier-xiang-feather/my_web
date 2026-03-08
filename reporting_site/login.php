@@ -21,12 +21,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $username;
         echo 'login success';
+        exit();
 
         header('Location: /reports.php');
         exit();
     } else {
         $error = 'Invalid username or password.';
         echo 'login failed';
+        exit();
     }
 }
 ?>
