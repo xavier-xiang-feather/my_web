@@ -4,10 +4,15 @@ require_once __DIR__ . '/includes/config.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    echo 'POST received';
-    exit();
+
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
+
+    //debug purpose
+    echo 'username input: [' . htmlspecialchars($username) . ']<br>';
+    echo 'password input: [' . htmlspecialchars($password) . ']<br>';
+    echo 'APP_USERNAME: [' . htmlspecialchars(APP_USERNAME) . ']<br>';
+    echo 'APP_PASSWORD: [' . htmlspecialchars(APP_PASSWORD) . ']<br>';
 
     if (
         $username === APP_USERNAME &&
@@ -15,11 +20,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ) {
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $username;
+        echo 'login success';
 
         header('Location: /reports.php');
         exit();
     } else {
         $error = 'Invalid username or password.';
+        echo 'login failed';
     }
 }
 ?>
