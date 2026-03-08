@@ -4,6 +4,8 @@ require_once __DIR__ . '/includes/config.php';
 $error = '';
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    echo 'POST received';
+    exit();
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
 
