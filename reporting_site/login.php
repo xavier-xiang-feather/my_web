@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (
         $username === APP_USERNAME &&
-        password_verify($password, APP_PASSWORD_HASH)
+        $password === APP_PASSWORD
     ) {
         $_SESSION['logged_in'] = true;
         $_SESSION['username'] = $username;
