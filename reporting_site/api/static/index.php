@@ -105,7 +105,7 @@ if ($rest !== "") {
   $id = (int)$rest;
 }
 
-// ---- DB connect ----
+// DB connect
 $config = require __DIR__ . "/db.php";
 $dsn = sprintf(
   "mysql:host=%s;dbname=%s;charset=%s",
