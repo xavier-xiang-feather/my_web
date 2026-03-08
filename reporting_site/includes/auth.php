@@ -4,7 +4,7 @@ if (session_status() === PHP_SESSION_NONE) {
 }
 
 function is_logged_in(): bool{
-    return isset($_SESSION['logged_in']) && $_SESSSION['logged_in'] === true;
+    return isset($_SESSION['logged_in']) && $_SESSION['logged_in'] === true;
 
 }
 
