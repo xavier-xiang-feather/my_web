@@ -68,7 +68,7 @@ try {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 24px;
+      margin-bottom: 40px;
     }
 
     .nav a {
@@ -110,8 +110,8 @@ try {
 </div>
 
 <div class="card">
-  <h1>Analytics Dashboard</h1>
-  <p>Browser distribution based on user agent records.</p>
+  <h1>Dashboard</h1>
+  <p>This is a distribution of how many events are recorded through each browser</p>
   <canvas id="browserChart"></canvas>
 </div>
 
@@ -126,7 +126,7 @@ new Chart(ctx, {
   data: {
     labels: labels,
     datasets: [{
-      label: 'Browser Count',
+      label: 'Counts',
       data: dataCounts,
       borderWidth: 1
     }]
