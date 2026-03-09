@@ -122,7 +122,7 @@ try {
 }
 
 // ---- Config ----
-$table = "mrxijian_events";   // table name in DB
+$table = "events";   // table name in DB
 $method = $_SERVER["REQUEST_METHOD"] ?? "GET";
 
 try {
