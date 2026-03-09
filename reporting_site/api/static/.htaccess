@@ -1,11 +1,11 @@
 RewriteEngine On
 
-# 允许所有方法进入 index.php
+
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteCond %{REQUEST_FILENAME} !-d
 RewriteRule ^ index.php [QSA,L]
 
-# 显式允许 REST 方法
+
 <LimitExcept GET POST PUT DELETE OPTIONS>
   Require all denied
 </LimitExcept>

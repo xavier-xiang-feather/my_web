@@ -14,7 +14,8 @@ try {
     $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
     $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
 
-    $sql = "SELECT * FROM mrxijian_events ORDER BY id DESC LIMIT 50";
+    // $sql = "SELECT * FROM mrxijian_events ORDER BY id DESC LIMIT 50";
+    $sql = "SELECT * FROM events ORDER BY id DESC LIMIT 50";
     $stmt = $pdo->query($sql);
     $rows = $stmt->fetchAll();
 } catch (PDOException $e) {
