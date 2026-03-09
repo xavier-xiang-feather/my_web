@@ -94,7 +94,7 @@ try {
   <a class="logout" href="/logout.php">Log Out</a>
 </div>
 
-<h1>Analytics Event Logs</h1>
+<h1>Event Logs</h1>
 
 <?php if (count($rows) > 0): ?>
   <table>
