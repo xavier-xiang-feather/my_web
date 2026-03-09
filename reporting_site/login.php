@@ -35,7 +35,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Login - Analytics Backend</title>
+  <title>Login to Analytics</title>
   <style>
     body {
       font-family: Arial, sans-serif;
@@ -84,7 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
   <div class="container">
-    <h1>Analytics Login</h1>
+    <h1>Login Page</h1>
     <form method="POST" action="/login.php">
       <label for="username">Username</label>
       <input id="username" name="username" type="text" required>
