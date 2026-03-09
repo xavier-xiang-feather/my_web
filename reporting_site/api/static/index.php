@@ -106,7 +106,7 @@ if ($rest !== "") {
 }
 
 // DB connect
-$config = require __DIR__ . "../../includes/db.php";
+$config = require __DIR__ . "/../../includes/db.php";
 $dsn = sprintf(
   "mysql:host=%s;dbname=%s;charset=%s",
   $config["host"], $config["db"], $config["charset"]
