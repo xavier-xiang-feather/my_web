@@ -2,7 +2,7 @@
 require_once __DIR__ . '/includes/auth.php';
 require_login();
 
-$dbConfig = require __DIR__ . '/api/static/db.php';
+$dbConfig = require __DIR__ . '/includes/db.php';
 
 try {
     $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
