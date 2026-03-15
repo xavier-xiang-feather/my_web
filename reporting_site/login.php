@@ -1,22 +1,9 @@
 <?php
 session_start();
-$config = require_once __DIR__ . '/includes/db.php';
+#get db connection
+$config = require __DIR__ . '/includes/connect_db.php';
 
 $error = '';
-
-# look up in db
-$dsn = "mysql:host={$config['host']};dbname={$config['db']};charset={$config['charset']}";
-#use pdo to access db
-$pdo = new PDO(
-  $dsn,
-  $config['user'],
-  $config['pass'],
-  [
-    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
-  ]
-);
-
-
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
@@ -39,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
 
-        header('Location: /reports.php');
+        header('Location: /index.php');
         exit();
     } else {
         $error = 'Invalid username or password.';
