@@ -179,10 +179,9 @@ role:newRole
 
 })
 .then(res=>res.text())
-.then(data=>{
-
-alert("Role updated");
-
+.then(data => {
+    alert("Role updated");
+});
 }
 
 </script>
