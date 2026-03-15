@@ -16,7 +16,7 @@ if (!$data) {
 $id = $data['id'] ?? null;
 $role = $data['role'] ?? null;
 
-$allowed_roles = ['viewer','analytics','superadmin'];
+$allowed_roles = ['viewer','analytics_browser','analytics_performance','analytics_behavior','superadmin'];
 
 if($_SESSION['role'] !== 'superadmin'){
     exit("access denied");

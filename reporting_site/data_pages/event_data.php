@@ -3,10 +3,10 @@
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
-require_once __DIR__ . '/includes/auth.php';
+require_once __DIR__ . '/../includes/auth.php';
 require_login();
 
-$dbConfig = require __DIR__ . '/includes/db.php';
+$dbConfig = require __DIR__ . '/../includes/db.php';
 
 try {
     $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
@@ -88,8 +88,7 @@ try {
 
 <div class="topbar">
   <div class="nav">
-    <a href="/reports.php">Reports</a>
-    <a href="/dashboard.php">Dashboard</a>
+    <a href="/../manager_pages/data_dashboard.php">Dashboard</a>
   </div>
   <a class="logout" href="/logout.php">Log Out</a>
 </div>
