@@ -5,11 +5,13 @@ require_login();
 
 require __DIR__ . '/../includes/connect_db.php';
 
+
+
+$data = json_decode(file_get_contents("php://input"), true);
+
 if (!$data) {
     exit("invalid json");
 }
-
-$data = json_decode(file_get_contents("php://input"), true);
 
 $id = $data['id'] ?? null;
 $role = $data['role'] ?? null;

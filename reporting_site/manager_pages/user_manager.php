@@ -28,7 +28,7 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
 <!DOCTYPE html>
-<html>
+<>
 <head>
 <meta charset="UTF-8">
 <title>User Manager</title>
@@ -179,8 +179,12 @@ role:newRole
 
 })
 .then(res=>res.text())
-.then(data => {
-    alert("Role updated");
+.then(data=>{
+    if(data.trim() === "success"){
+        alert("Role updated");
+    } else {
+        alert(data);
+    }
 });
 }
 
