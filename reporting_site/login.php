@@ -1,12 +1,32 @@
 <?php
-require_once __DIR__ . '/includes/config.php';
+session_start();
+$config = require_once __DIR__ . '/includes/db.php';
 
 $error = '';
+
+# look up in db
+$dsn = "mysql:host={$config['host']};dbname={$config['db']};charset={$config['charset']}";
+#use pdo to access db
+$pdo = new PDO(
+  $dsn,
+  $config['user'],
+  $config['pass'],
+  [
+    PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION
+  ]
+);
+
+
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $username = trim($_POST['username'] ?? '');
     $password = $_POST['password'] ?? '';
+
+    //get username and password from db
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE username=?");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
 
     //debug purpose
     // echo 'username input: [' . htmlspecialchars($username) . ']<br>';
@@ -14,13 +34,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // echo 'APP_USERNAME: [' . htmlspecialchars(APP_USERNAME) . ']<br>';
     // echo 'APP_PASSWORD: [' . htmlspecialchars(APP_PASSWORD) . ']<br>';
 
-    if (
-        $username === APP_USERNAME &&
-        //password_verify($password, APP_PASSWORD_HASH)
-        $password === APP_PASSWORD
-    ) {
+    if ($user && $password === $user['password']){
         $_SESSION['logged_in'] = true;
-        $_SESSION['username'] = $username;
+        $_SESSION['username'] = $user['username'];
+        $_SESSION['role'] = $user['role'];
 
         header('Location: /reports.php');
         exit();
