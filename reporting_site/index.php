@@ -1,8 +1,8 @@
 <?php
+
+//server use:
 require __DIR__ . '/includes/auth.php';
 require_login();
-
-
 
 $username = $_SESSION['username'];
 $role = $_SESSION['role'];

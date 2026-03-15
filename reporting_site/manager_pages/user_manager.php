@@ -1,17 +1,16 @@
 <?php
+
+//server use:
 require __DIR__ . '/../includes/auth.php';
 require_login();
 
-//check role
 if ($_SESSION['role'] !== 'superadmin') {
     echo "Access denied";
     exit();
 }
 
-//connect db
 require __DIR__ . '/../includes/connect_db.php';
 
-// //read users
 $stmt = $pdo->query("SELECT id, username, role FROM users ORDER BY id");
 $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
@@ -19,10 +18,11 @@ $users = $stmt->fetchAll(PDO::FETCH_ASSOC);
 //test
 // $users = [
 //     ['id' => 1, 'username' => 'admin', 'role' => 'superadmin'],
-//     ['id' => 2, 'username' => 'sam', 'role' => 'analytics'],
+//     ['id' => 2, 'username' => 'sam', 'role' => 'analytics_browser'],
 //     ['id' => 3, 'username' => 'bob', 'role' => 'viewer'],
-//     ['id' => 4, 'username' => 'alice', 'role' => 'analytics']
+//     ['id' => 4, 'username' => 'alice', 'role' => 'analytics_behavior']
 // ];
+
 
 ?>
 
@@ -140,7 +140,9 @@ select{
 
 <option value="superadmin" <?= $user['role']=='superadmin'?'selected':'' ?>>superadmin</option>
 
-<option value="analytics" <?= $user['role']=='analytics'?'selected':'' ?>>analytics</option>
+<option value="analytics_browser" <?= $user['role']=='analytics_browser'?'selected':'' ?>>analytics_browser</option>
+<option value="analytics_performance" <?= $user['role']=='analytics_performance'?'selected':'' ?>>analytics_performance</option>
+<option value="analytics_behavior" <?= $user['role']=='analytics_behavior'?'selected':'' ?>>analytics_behavior</option>
 
 <option value="viewer" <?= $user['role']=='viewer'?'selected':'' ?>>viewer</option>
 
