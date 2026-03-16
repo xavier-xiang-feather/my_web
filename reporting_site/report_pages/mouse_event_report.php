@@ -237,7 +237,7 @@ animation:false,
 
 plugins:{
     legend:{
-        display:false
+        display: chartType === "pie"
     }
 },
 scales: chartType==="bar"
