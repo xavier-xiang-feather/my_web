@@ -15,15 +15,15 @@ $datasets = [
     [
         "id" => 1,
         "name" => "Event Logs",
-        "category" => "browser/behavior",
+        "category" => "browser/behavior/performance",
         "path" => "/../data_pages/event_data.php"
-    ],
-    [
-        "id" => 2,
-        "name" => "Performance Data",
-        "category" => "performance",
-        "path" => ""
     ]
+    // [
+    //     "id" => 2,
+    //     "name" => "Performance Data",
+    //     "category" => "performance",
+    //     "path" => ""
+    // ]
 ];
 
 //test purpose

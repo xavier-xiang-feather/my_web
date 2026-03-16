@@ -5,6 +5,7 @@ require_login();
 $dbConfig = require __DIR__ . '/../includes/db.php';
 
 $chartType = $_GET['chart'] ?? 'bar';
+$printMode = isset($_GET['print']);
 
 try {
     $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
@@ -240,6 +241,14 @@ scales: chartType==='bar'
 function getChartImage(){
 return document.getElementById('browserChart').toDataURL('image/png');
 }
+
+<?php if($printMode): ?>
+window.onload = function(){
+    setTimeout(()=>{
+        window.print();
+    },500);
+};
+<?php endif; ?>
 
 </script>
 

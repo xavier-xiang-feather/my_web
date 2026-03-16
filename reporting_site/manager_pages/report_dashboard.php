@@ -278,60 +278,23 @@ function addComment(reportId, category){
 }
 
 function exportReport(reportId){
+
     const reports = [
         {id: 1, path: "/../report_pages/browser_report.php"},
         {id: 2, path: "/../report_pages/mouse_event_report.php"},
         {id: 3, path: "/../report_pages/performance_report.php"}
     ];
+
     const report = reports.find(r => r.id === reportId);
+
     if(!report) return;
 
-    let iframe = document.createElement('iframe');
-    iframe.style.display = 'none';
-    iframe.src = report.path;
-    document.body.appendChild(iframe);
+    const select = document.getElementById("chart"+reportId);
 
-    iframe.onload = function() {
-        setTimeout(() => {
-            let chartImage = null;
-            try {
-                const iframeWin = iframe.contentWindow;
-                if(iframeWin.getChartImage){
-                    chartImage = iframeWin.getChartImage();
-                }
-            } catch(e) {
-                console.error("Iframe access error:", e);
-            }
+    const chartType = select.value;
 
-            if(!chartImage || chartImage === "data:,"){
-                alert("Failed to capture chart image. Please try again.");
-                document.body.removeChild(iframe);
-                return;
-            }
+    window.open(report.path + "?chart=" + chartType + "&print=1","_blank");
 
-            fetch("/api/static/export_report.php", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    id: reportId,
-                    chart: chartImage
-                })
-            })
-            .then(res => res.json())
-            .then(data => {
-                if(data.status === "success") {
-                    window.open(data.url);
-                } else {
-                    alert("Error: " + data.message);
-                }
-                document.body.removeChild(iframe);
-            })
-            .catch(err => {
-                console.error(err);
-                document.body.removeChild(iframe);
-            });
-        }, 1500);
-    };
 }
 
 </script>
