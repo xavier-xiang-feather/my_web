@@ -43,7 +43,7 @@ jobs:
             --exclude ".github/" \
             collector_site/ \
             ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/collector.mrxijian.site/public_html/
-            
+
       - name: Fix CGI permission
         run: |
           ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} \
@@ -55,6 +55,7 @@ jobs:
           rsync -avz --delete \
             --exclude ".git/" \
             --exclude ".github/" \
+            --exclude "exports/" \
             reporting_site/ \
             ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/reporting.mrxijian.site/public_html/
   
