@@ -55,7 +55,7 @@ try {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Dashboard</title>
+  <title>Accessed Browser Report</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <style>
     body {
@@ -112,6 +112,7 @@ try {
   <h1>Dashboard</h1>
   <p>This is a distribution of how many events are recorded through each browser</p>
   <canvas id="browserChart"></canvas>
+  <img id="chartImage" style="display:none;">
 </div>
 
 <script>
@@ -120,7 +121,7 @@ const dataCounts = <?= json_encode($counts) ?>;
 
 const ctx = document.getElementById('browserChart').getContext('2d');
 
-new Chart(ctx, {
+const chart = new Chart(ctx, {
   type: 'bar',
   data: {
     labels: labels,
@@ -143,9 +144,15 @@ new Chart(ctx, {
   }
 });
 
-window.getChartImage = function(){
-return chart.toBase64Image();
-};
+/* 生成 base64 image 给 PDF 用 */
+
+setTimeout(function(){
+
+  const img = chart.toBase64Image();
+
+  document.getElementById("chartImage").src = img;
+
+},500);
 </script>
 
 </body>

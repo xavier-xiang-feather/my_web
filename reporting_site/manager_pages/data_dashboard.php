@@ -123,7 +123,8 @@ a:hover{
 
 <div class="home">
 <a href="/index.php">Reporting Home Page</a>
-<a href="/report_dashboard.php">Report Dashboard</a>
+<span> | </span>
+<a href="/../manager_pages/report_dashboard.php">Report Dashboard</a>
 </div>
 
 

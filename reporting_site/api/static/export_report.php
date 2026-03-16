@@ -56,10 +56,26 @@ exit();
 
 /* build HTML for PDF */
 
-$html = "
-<h1>$title</h1>
-<p>Generated at: ".date("Y-m-d H:i:s")."</p>
-";
+switch($reportId){
+
+case 1:
+$page = "https://reporting.mrxijian.site/report_pages/browser_report.php";
+break;
+
+case 2:
+$page = "https://reporting.mrxijian.site/report_pages/mouse_event_report.php";
+break;
+
+case 3:
+$page = "https://reporting.mrxijian.site/report_pages/performance_report.php";
+break;
+
+default:
+exit("unknown report");
+
+}
+
+$html = file_get_contents($page);
 
 /* insert chart if provided */
 
