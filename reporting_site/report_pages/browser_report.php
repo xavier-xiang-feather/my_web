@@ -4,6 +4,9 @@ require_login();
 
 $dbConfig = require __DIR__ . '/../includes/db.php';
 
+/* chart type (default histogram) */
+$chartType = $_GET['chart'] ?? 'bar';
+
 try {
     $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
     $pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass']);
@@ -33,7 +36,7 @@ try {
     $labels = array_keys($browserCounts);
     $counts = array_values($browserCounts);
 
-    /* -------- 读取最近10条 comment -------- */
+    /* -------- recent 10 comments -------- */
 
     $stmt = $pdo->prepare(
         "SELECT comment, author, created_at
@@ -50,118 +53,190 @@ try {
     die("Database error: " . htmlspecialchars($e->getMessage()));
 }
 ?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Accessed Browser Report</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 30px; background: #f8fafc; }
-    .topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; }
-    .nav a { margin-right: 14px; text-decoration: none; color: #2563eb; font-weight: bold; }
-    .logout { padding: 8px 14px; background: #dc2626; color: white; text-decoration: none; border-radius: 6px; }
-    .card { background: white; padding: 24px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 1000px; }
-    canvas { margin-top: 20px; }
+<meta charset="UTF-8">
+<title>Accessed Browser Report</title>
 
-    .comment-section{
-        margin-top:40px;
-        padding-top:20px;
-        border-top:1px solid #ddd;
-    }
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    .comment-box{
-        background:#f1f5f9;
-        padding:16px;
-        border-radius:8px;
-        margin-top:12px;
-    }
+<style>
 
-    .comment-meta{
-        margin-top:6px;
-        font-size:13px;
-        color:#666;
-    }
-  </style>
+body { font-family: Arial, sans-serif; margin: 30px; background: #f8fafc; }
+
+.topbar {
+display: flex;
+justify-content: space-between;
+align-items: center;
+margin-bottom: 40px;
+}
+
+.nav a {
+margin-right: 14px;
+text-decoration: none;
+color: #2563eb;
+font-weight: bold;
+}
+
+.logout {
+padding: 8px 14px;
+background: #dc2626;
+color: white;
+text-decoration: none;
+border-radius: 6px;
+}
+
+.card {
+background: white;
+padding: 24px;
+border-radius: 10px;
+box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+max-width: 1000px;
+}
+
+canvas {
+margin-top: 20px;
+}
+
+.comment-section{
+margin-top:40px;
+padding-top:20px;
+border-top:1px solid #ddd;
+}
+
+.comment-box{
+background:#f1f5f9;
+padding:16px;
+border-radius:8px;
+margin-top:12px;
+}
+
+.comment-meta{
+margin-top:6px;
+font-size:13px;
+color:#666;
+}
+
+</style>
 </head>
+
 <body>
 
 <div class="topbar">
-  <div class="nav">
-    <a href="/../manager_pages/report_dashboard.php">Dashboard</a>
-  </div>
-  <a class="logout" href="/../logout.php">Log Out</a>
+
+<div class="nav">
+<a href="/../manager_pages/report_dashboard.php">Dashboard</a>
+</div>
+
+<a class="logout" href="/../logout.php">Log Out</a>
+
 </div>
 
 <div class="card">
-  <h1>Accessed Browser Report</h1>
-  <p>This is a distribution of how many events are recorded through each browser</p>
-  <canvas id="browserChart"></canvas>
 
-  <!-- Comment Section -->
+<h1>Accessed Browser Report</h1>
 
-  <div class="comment-section">
+<p>This is a distribution of how many events are recorded through each browser</p>
 
-    <h2>Recent Analyst Comments</h2>
+<canvas id="browserChart"></canvas>
 
-    <?php if(!empty($comments)): ?>
+<div class="comment-section">
 
-        <?php foreach($comments as $c): ?>
+<h2>Recent Analyst Comments</h2>
 
-            <div class="comment-box">
+<?php if(!empty($comments)): ?>
 
-                <?= htmlspecialchars($c['comment']) ?>
+<?php foreach($comments as $c): ?>
 
-                <div class="comment-meta">
-                    Comment by <?= htmlspecialchars($c['author']) ?>
-                    | <?= htmlspecialchars($c['created_at']) ?>
-                </div>
+<div class="comment-box">
 
-            </div>
+<?= htmlspecialchars($c['comment']) ?>
 
-        <?php endforeach; ?>
+<div class="comment-meta">
+Comment by <?= htmlspecialchars($c['author']) ?>
+|
+<?= htmlspecialchars($c['created_at']) ?>
+</div>
 
-    <?php else: ?>
+</div>
 
-        <div class="comment-box">
-            No comment available yet.
-        </div>
+<?php endforeach; ?>
 
-    <?php endif; ?>
+<?php else: ?>
 
-  </div>
+<div class="comment-box">
+No comment available yet.
+</div>
+
+<?php endif; ?>
+
+</div>
 
 </div>
 
 <script>
+
+const chartType = "<?= $chartType ?>";
+
 const labels = <?= json_encode($labels) ?>;
 const dataCounts = <?= json_encode($counts) ?>;
 
 const ctx = document.getElementById('browserChart').getContext('2d');
 
 const chart = new Chart(ctx, {
-  type: 'bar',
-  data: {
-    labels: labels,
-    datasets: [{
-      label: 'Counts',
-      data: dataCounts,
-      backgroundColor: 'rgba(37, 99, 235, 0.5)',
-      borderColor: 'rgba(37, 99, 235, 1)',
-      borderWidth: 1
-    }]
-  },
-  options: {
-    responsive: true,
-    animation: false,
-    scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
-  }
+
+type: chartType,
+
+data: {
+
+labels: labels,
+
+datasets: [{
+
+label: 'Counts',
+
+data: dataCounts,
+
+backgroundColor: [
+
+'rgba(37,99,235,0.6)',
+'rgba(16,185,129,0.6)',
+'rgba(245,158,11,0.6)',
+'rgba(239,68,68,0.6)',
+'rgba(139,92,246,0.6)',
+'rgba(14,165,233,0.6)',
+'rgba(156,163,175,0.6)'
+
+],
+
+borderColor: 'rgba(37,99,235,1)',
+
+borderWidth: 1
+
+}]
+
+},
+
+options: {
+
+responsive: true,
+
+animation: false,
+
+scales: chartType === 'bar'
+? { y: { beginAtZero: true, ticks: { precision: 0 } } }
+: {}
+
+}
+
 });
 
-// 给 Dashboard 调用的函数
 function getChartImage(){
-  return document.getElementById('browserChart').toDataURL('image/png');
+return document.getElementById('browserChart').toDataURL('image/png');
 }
+
 </script>
 
 </body>

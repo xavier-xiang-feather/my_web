@@ -126,6 +126,10 @@ button:hover{
     background:#1e4ed8;
 }
 
+select{
+    padding:6px;
+}
+
 </style>
 
 </head>
@@ -148,6 +152,7 @@ button:hover{
 <th>Report Name</th>
 <th>Category</th>
 <th>Export</th>
+<th>Chart Type</th>
 <th>Comment</th>
 </tr>
 </thead>
@@ -172,6 +177,20 @@ button:hover{
 <button onclick="exportReport(<?= $report['id'] ?>)">
 Export
 </button>
+</td>
+
+<td>
+
+<select
+onchange="changeChart(<?= $report['id'] ?>,'<?= $report['path'] ?>',this)"
+<?= canAccess($report['category'],$role) ? '' : 'disabled' ?>
+>
+
+<option value="bar">Histogram</option>
+<option value="pie">Pie Chart</option>
+
+</select>
+
 </td>
 
 <td>
@@ -203,6 +222,14 @@ No Permission
 </div>
 
 <script>
+
+function changeChart(reportId, path, select){
+
+    const chartType = select.value;
+
+    window.open(path + "?chart=" + chartType, "_blank");
+
+}
 
 function addComment(reportId, category){
 
@@ -241,7 +268,6 @@ function addComment(reportId, category){
 }
 
 function exportReport(reportId){
-    // 路径映射
     const reports = [
         {id: 1, path: "/../report_pages/browser_report.php"},
         {id: 2, path: "/../report_pages/mouse_event_report.php"},
@@ -250,19 +276,16 @@ function exportReport(reportId){
     const report = reports.find(r => r.id === reportId);
     if(!report) return;
 
-    // 创建隐藏容器
     let iframe = document.createElement('iframe');
     iframe.style.display = 'none';
     iframe.src = report.path;
     document.body.appendChild(iframe);
 
     iframe.onload = function() {
-        // 增加等待时间，确保 iframe 内部脚本执行完毕
         setTimeout(() => {
             let chartImage = null;
             try {
                 const iframeWin = iframe.contentWindow;
-                // 调用报表页面定义的函数
                 if(iframeWin.getChartImage){
                     chartImage = iframeWin.getChartImage();
                 }
@@ -270,7 +293,6 @@ function exportReport(reportId){
                 console.error("Iframe access error:", e);
             }
 
-            // 检查抓取结果
             if(!chartImage || chartImage === "data:,"){
                 alert("Failed to capture chart image. Please try again.");
                 document.body.removeChild(iframe);
@@ -298,7 +320,7 @@ function exportReport(reportId){
                 console.error(err);
                 document.body.removeChild(iframe);
             });
-        }, 1500); // 1.5秒等待
+        }, 1500);
     };
 }
 
