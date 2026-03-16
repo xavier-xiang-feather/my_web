@@ -197,8 +197,7 @@ No comment available yet.
 </div>
 
 <script>
-
-const ctx = document.getElementById('performanceChart').getContext('2d');
+    const ctx = document.getElementById('performanceChart').getContext('2d');
 
 new Chart(ctx,{
 
@@ -211,17 +210,14 @@ datasets:[{
 label:'Performance Distribution',
 
 backgroundColor:'rgba(37,99,235,0.5)',
-
 borderColor:'rgba(37,99,235,1)',
 
-borderWidth:1,
-
 data:[
-<?= json_encode($dns) ?>,
-<?= json_encode($tcp) ?>,
-<?= json_encode($ttfb) ?>,
-<?= json_encode($dom) ?>,
-<?= json_encode($load) ?>
+{data: <?= json_encode($dns) ?>},
+{data: <?= json_encode($tcp) ?>},
+{data: <?= json_encode($ttfb) ?>},
+{data: <?= json_encode($dom) ?>},
+{data: <?= json_encode($load) ?>}
 ]
 
 }]
@@ -230,17 +226,12 @@ data:[
 
 options:{
 responsive:true,
-
 plugins:{
-legend:{
-display:false
+legend:{display:false}
 }
-}
-
 }
 
 });
-
 </script>
 
 </body>
