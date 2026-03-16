@@ -166,7 +166,7 @@ select{
 <td><?= $report['id'] ?></td>
 
 <td>
-<a href="<?= $report['path'] ?>">
+<a href="#" onclick="openReport(<?= $report['id'] ?>,'<?= $report['path'] ?>')">
 <?= htmlspecialchars($report['name']) ?>
 </a>
 </td>
@@ -182,11 +182,11 @@ Export
 <td>
 
 <select
-onchange="changeChart(<?= $report['id'] ?>,'<?= $report['path'] ?>',this)"
+id="chart<?= $report['id'] ?>"
 <?= canAccess($report['category'],$role) ? '' : 'disabled' ?>
 >
 
-<option value="bar">Histogram</option>
+<option value="bar" selected>Histogram</option>
 <option value="pie">Pie Chart</option>
 
 </select>
@@ -223,7 +223,9 @@ No Permission
 
 <script>
 
-function changeChart(reportId, path, select){
+function openReport(reportId, path){
+
+    const select = document.getElementById("chart"+reportId);
 
     const chartType = select.value;
 

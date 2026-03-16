@@ -4,7 +4,6 @@ require_login();
 
 $dbConfig = require __DIR__ . '/../includes/db.php';
 
-/* chart type (default histogram) */
 $chartType = $_GET['chart'] ?? 'bar';
 
 try {
@@ -36,8 +35,6 @@ try {
     $labels = array_keys($browserCounts);
     $counts = array_values($browserCounts);
 
-    /* -------- recent 10 comments -------- */
-
     $stmt = $pdo->prepare(
         "SELECT comment, author, created_at
          FROM comments
@@ -67,37 +64,42 @@ try {
 body { font-family: Arial, sans-serif; margin: 30px; background: #f8fafc; }
 
 .topbar {
-display: flex;
-justify-content: space-between;
-align-items: center;
-margin-bottom: 40px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:40px;
 }
 
 .nav a {
-margin-right: 14px;
-text-decoration: none;
-color: #2563eb;
-font-weight: bold;
+margin-right:14px;
+text-decoration:none;
+color:#2563eb;
+font-weight:bold;
 }
 
 .logout {
-padding: 8px 14px;
-background: #dc2626;
-color: white;
-text-decoration: none;
-border-radius: 6px;
+padding:8px 14px;
+background:#dc2626;
+color:white;
+text-decoration:none;
+border-radius:6px;
 }
 
 .card {
-background: white;
-padding: 24px;
-border-radius: 10px;
-box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-max-width: 1000px;
+background:white;
+padding:24px;
+border-radius:10px;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+max-width:1000px;
 }
 
-canvas {
-margin-top: 20px;
+.chart-container{
+width:100%;
+max-width:900px;
+}
+
+.chart-container.pie{
+max-width:630px;
 }
 
 .comment-section{
@@ -140,7 +142,9 @@ color:#666;
 
 <p>This is a distribution of how many events are recorded through each browser</p>
 
+<div class="chart-container">
 <canvas id="browserChart"></canvas>
+</div>
 
 <div class="comment-section">
 
@@ -180,6 +184,10 @@ No comment available yet.
 
 const chartType = "<?= $chartType ?>";
 
+if(chartType === "pie"){
+document.querySelector(".chart-container").classList.add("pie");
+}
+
 const labels = <?= json_encode($labels) ?>;
 const dataCounts = <?= json_encode($counts) ?>;
 
@@ -195,12 +203,11 @@ labels: labels,
 
 datasets: [{
 
-label: 'Counts',
+label:'Counts',
 
-data: dataCounts,
+data:dataCounts,
 
-backgroundColor: [
-
+backgroundColor:[
 'rgba(37,99,235,0.6)',
 'rgba(16,185,129,0.6)',
 'rgba(245,158,11,0.6)',
@@ -208,27 +215,20 @@ backgroundColor: [
 'rgba(139,92,246,0.6)',
 'rgba(14,165,233,0.6)',
 'rgba(156,163,175,0.6)'
-
 ],
 
-borderColor: 'rgba(37,99,235,1)',
-
-borderWidth: 1
+borderWidth:1
 
 }]
 
 },
 
-options: {
-
-responsive: true,
-
-animation: false,
-
-scales: chartType === 'bar'
-? { y: { beginAtZero: true, ticks: { precision: 0 } } }
+options:{
+responsive:true,
+animation:false,
+scales: chartType==='bar'
+? {y:{beginAtZero:true,ticks:{precision:0}}}
 : {}
-
 }
 
 });
