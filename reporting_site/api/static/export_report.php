@@ -9,65 +9,55 @@ use Dompdf\Options;
 header('Content-Type: application/json');
 
 $data = json_decode(file_get_contents("php://input"), true);
-
-if(!$data){
+if(!$data) {
     echo json_encode(["status"=>"error","message"=>"invalid json"]);
-    exit();
+    exit;
 }
 
 $reportId = $data['id'] ?? null;
-if(!$reportId){
-    echo json_encode(["status"=>"error","message"=>"missing report id"]);
-    exit();
-}
+$chart = $data['chart'] ?? '';
 
-/* report title */
 switch($reportId){
     case 1: $title = "Accessed Browser Report"; break;
     case 2: $title = "Mouse Event Report"; break;
     case 3: $title = "Performance Report"; break;
-    default:
-        echo json_encode(["status"=>"error","message"=>"unknown report"]);
-        exit();
+    default: $title = "System Report";
 }
 
-/* 核心修复：处理 Base64 数据 */
-$chart = $data['chart'] ?? '';
-
-// 如果是通过 Chart.js 传过来的，确保没有多余的换行符
-$chart = str_replace(["\r", "\n"], '', $chart);
-
+// 构造 PDF 的 HTML 内容
 $html = "
 <html>
 <head>
     <meta charset='UTF-8'>
     <style>
-        body { font-family: Helvetica, sans-serif; text-align: center; }
-        .header { margin-bottom: 30px; }
-        .chart-container { width: 100%; }
-        img { width: 600px; height: auto; border: 1px solid #eee; }
+        body { font-family: Helvetica, Arial, sans-serif; text-align: center; color: #333; }
+        .header { margin-bottom: 30px; border-bottom: 1px solid #ccc; padding-bottom: 10px; }
+        .chart-box { width: 100%; margin-top: 20px; }
+        img { width: 600px; height: auto; }
     </style>
 </head>
 <body>
     <div class='header'>
         <h1>$title</h1>
         <p>Generated at: " . date('Y-m-d H:i:s') . "</p>
-    </div>";
+    </div>
+    <div class='chart-box'>";
 
-if($chart){
-    // 确保 src 属性正确包裹
-    $html .= "<div class='chart-container'><img src='$chart'></div>";
+if ($chart && strpos($chart, 'data:image/png;base64,') === 0) {
+    $html .= "<img src='$chart'>";
+} else {
+    $html .= "<p style='color:red;'>Chart data missing or invalid.</p>";
 }
 
-$html .= "</body></html>";
+$html .= "
+    </div>
+</body>
+</html>";
 
-/* generate PDF */
+// 配置 Dompdf
 $options = new Options();
-// 关键配置：允许处理远程资源和 Base64
-$options->set('isRemoteEnabled', true); 
-$options->set('isPhpEnabled', true);
+$options->set('isRemoteEnabled', true);
 $options->set('isHtml5ParserEnabled', true);
-
 $dompdf = new Dompdf($options);
 
 $dompdf->loadHtml($html);
@@ -75,16 +65,14 @@ $dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
 
 $exportDir = __DIR__ . '/../../exports/';
-if(!file_exists($exportDir)){
+if(!file_exists($exportDir)) {
     mkdir($exportDir, 0755, true);
 }
 
 $filename = "report_".$reportId."_".time().".pdf";
-$filePath = $exportDir . $filename;
+file_put_contents($exportDir . $filename, $dompdf->output());
 
-if(file_put_contents($filePath, $dompdf->output())){
-    $url = "/exports/".$filename;
-    echo json_encode(["status"=>"success","url"=>$url]);
-} else {
-    echo json_encode(["status"=>"error","message"=>"Write permission denied on exports folder"]);
-}
+echo json_encode([
+    "status" => "success",
+    "url" => "/exports/" . $filename
+]);
