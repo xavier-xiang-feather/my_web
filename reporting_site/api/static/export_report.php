@@ -3,7 +3,7 @@
 require __DIR__ . '/../../includes/auth.php';
 require_login();
 
-require __DIR__ . '/../../vendor/autoload.php';
+require __DIR__ . '/../../../vendor/autoload.php';
 
 use Dompdf\Dompdf;
 
