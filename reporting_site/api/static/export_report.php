@@ -4,7 +4,7 @@ require_login();
 require __DIR__ . '/../../../vendor/autoload.php';
 
 use Dompdf\Dompdf;
-use Dompdf\Options; // 新增
+use Dompdf\Options;
 
 header('Content-Type: application/json');
 
@@ -31,26 +31,47 @@ switch($reportId){
         exit();
 }
 
-/* build HTML for PDF - 这里改用干净的模板，只嵌入图片 */
+/* 核心修复：处理 Base64 数据 */
 $chart = $data['chart'] ?? '';
+
+// 如果是通过 Chart.js 传过来的，确保没有多余的换行符
+$chart = str_replace(["\r", "\n"], '', $chart);
+
 $html = "
-<div style='text-align:center; font-family:Arial;'>
-    <h1>$title</h1>
-    <p>Generated at: ".date('Y-m-d H:i:s')."</p>";
+<html>
+<head>
+    <meta charset='UTF-8'>
+    <style>
+        body { font-family: Helvetica, sans-serif; text-align: center; }
+        .header { margin-bottom: 30px; }
+        .chart-container { width: 100%; }
+        img { width: 600px; height: auto; border: 1px solid #eee; }
+    </style>
+</head>
+<body>
+    <div class='header'>
+        <h1>$title</h1>
+        <p>Generated at: " . date('Y-m-d H:i:s') . "</p>
+    </div>";
 
 if($chart){
-    $html .= "<div style='margin-top:20px;'><img src='$chart' style='width:100%'></div>";
+    // 确保 src 属性正确包裹
+    $html .= "<div class='chart-container'><img src='$chart'></div>";
 }
 
-$html .= "</div>";
+$html .= "</body></html>";
 
 /* generate PDF */
 $options = new Options();
-$options->set('isRemoteEnabled', true); // 必须开启以支持 Base64 图片
+// 关键配置：允许处理远程资源和 Base64
+$options->set('isRemoteEnabled', true); 
+$options->set('isPhpEnabled', true);
+$options->set('isHtml5ParserEnabled', true);
+
 $dompdf = new Dompdf($options);
 
 $dompdf->loadHtml($html);
-$dompdf->setPaper('A4');
+$dompdf->setPaper('A4', 'portrait');
 $dompdf->render();
 
 $exportDir = __DIR__ . '/../../exports/';
@@ -61,7 +82,9 @@ if(!file_exists($exportDir)){
 $filename = "report_".$reportId."_".time().".pdf";
 $filePath = $exportDir . $filename;
 
-file_put_contents($filePath, $dompdf->output());
-
-$url = "/exports/".$filename;
-echo json_encode(["status"=>"success","url"=>$url]);
+if(file_put_contents($filePath, $dompdf->output())){
+    $url = "/exports/".$filename;
+    echo json_encode(["status"=>"success","url"=>$url]);
+} else {
+    echo json_encode(["status"=>"error","message"=>"Write permission denied on exports folder"]);
+}
