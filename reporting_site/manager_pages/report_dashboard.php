@@ -2,6 +2,29 @@
 require __DIR__ . '/../includes/auth.php';
 require_login();
 
+$role = $_SESSION['role'];
+
+function canAccess($category, $role){
+
+    if($role === 'superadmin'){
+        return true;
+    }
+
+    if(str_contains($category,'browser') && $role === 'analytics_browser'){
+        return true;
+    }
+
+    if(str_contains($category,'behavior') && $role === 'analytics_behavior'){
+        return true;
+    }
+
+    if(str_contains($category,'performance') && $role === 'analytics_performance'){
+        return true;
+    }
+
+    return false;
+}
+
 $reports = [
 
 [
@@ -125,6 +148,7 @@ button:hover{
 <th>Report Name</th>
 <th>Category</th>
 <th>Export</th>
+<th>Comment</th>
 </tr>
 </thead>
 
@@ -150,6 +174,24 @@ Export
 </button>
 </td>
 
+<td>
+
+<?php if(canAccess($report['category'], $role)): ?>
+
+<button onclick="addComment(<?= $report['id'] ?>,'<?= $report['category'] ?>')">
+Add Comment
+</button>
+
+<?php else: ?>
+
+<button disabled style="background:gray; cursor:not-allowed">
+No Permission
+</button>
+
+<?php endif; ?>
+
+</td>
+
 </tr>
 
 <?php endforeach; ?>
@@ -161,6 +203,43 @@ Export
 </div>
 
 <script>
+
+function addComment(reportId, category){
+
+    const comment = prompt("Enter your comment:");
+
+    if(!comment){
+        return;
+    }
+
+    fetch("/api/static/add_comment.php",{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            report_id:reportId,
+            category:category,
+            comment:comment
+        })
+
+    })
+    .then(res=>res.text())
+    .then(data=>{
+
+        if(data==="success"){
+            alert("Comment saved");
+        }else{
+            alert(data);
+        }
+
+    });
+
+}
+
 function exportReport(reportId){
     // 路径映射
     const reports = [
@@ -222,6 +301,7 @@ function exportReport(reportId){
         }, 1500); // 1.5秒等待
     };
 }
+
 </script>
 
 </body>
