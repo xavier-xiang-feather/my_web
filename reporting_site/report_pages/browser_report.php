@@ -112,7 +112,7 @@ try {
   <h1>Accessed Browser Report</h1>
   <p>This is a distribution of how many events are recorded through each browser</p>
   <canvas id="browserChart"></canvas>
-  <img id="chartImage" style="display:none;">
+  <img id="chartImage" style="display:900px;">
 </div>
 
 <script>
