@@ -54,27 +54,27 @@ exit();
 }
 
 /* build HTML for PDF */
+ob_start();
 
 switch($reportId){
 
 case 1:
-$page = "https://reporting.mrxijian.site/report_pages/browser_report.php";
+require __DIR__ . "/../../report_pages/browser_report.php";
 break;
 
 case 2:
-$page = "https://reporting.mrxijian.site/report_pages/mouse_event_report.php";
+require __DIR__ . "/../../report_pages/mouse_event_report.php";
 break;
 
 case 3:
-$page = "https://reporting.mrxijian.site/report_pages/performance_report.php";
+require __DIR__ . "/../../report_pages/performance_report.php";
 break;
 
 default:
 exit("unknown report");
 
 }
-
-$html = file_get_contents($page);
+$html = ob_get_clean();
 
 /* insert chart if provided */
 
