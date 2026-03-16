@@ -185,10 +185,31 @@ a:hover{
 
 </div>
 <script>
-    function updateData(dataID){
-        console.log("update data clicked");
-        //add feature later
-    }
+    function updateData(dataId){
+
+        fetch("/api/static/update_data.php",{
+
+        method:"POST",
+
+        headers:{
+        "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+        id:dataId
+        })
+
+        })
+        .then(res=>res.text())
+        .then(data=>{
+        if(data==="success"){
+        alert("Data updated");
+        }else{
+        alert(data);
+        }
+        });
+
+}
 </script>
 
 </body>

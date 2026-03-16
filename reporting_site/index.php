@@ -1,15 +1,15 @@
 <?php
 
 //server use:
-require __DIR__ . '/includes/auth.php';
-require_login();
+// require __DIR__ . '/includes/auth.php';
+// require_login();
 
-$username = $_SESSION['username'];
-$role = $_SESSION['role'];
+// $username = $_SESSION['username'];
+// $role = $_SESSION['role'];
 
 //test purpose:
-// $username = 'test_user';
-// $role = 'superadmin';
+$username = 'test_user';
+$role = 'superadmin';
 
 ?>
 
