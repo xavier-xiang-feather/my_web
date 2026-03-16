@@ -146,13 +146,23 @@ const chart = new Chart(ctx, {
 
 /* 生成 base64 image 给 PDF 用 */
 
+let chartImage = null;
+
 setTimeout(function(){
 
-  const img = chart.toBase64Image();
+  chartImage = chart.toBase64Image();
 
-  document.getElementById("chartImage").src = img;
+  document.getElementById("chartImage").src = chartImage;
 
 },500);
+
+
+/* export function (给 dashboard 调用) */
+
+function getChartImage(){
+  return chartImage;
+}
+
 </script>
 
 </body>

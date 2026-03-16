@@ -74,9 +74,18 @@ default:
 exit("unknown report");
 
 }
+
 $html = ob_get_clean();
 
 /* insert chart if provided */
+
+$chart = $data['chart'] ?? '';
+
+if($chart){
+$html .= "<div style='margin-top:20px;'>
+<img src='$chart' style='width:700px'>
+</div>";
+}
 
 /* generate PDF */
 
