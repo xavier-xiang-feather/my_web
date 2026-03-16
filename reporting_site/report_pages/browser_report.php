@@ -33,28 +33,18 @@ try {
     $labels = array_keys($browserCounts);
     $counts = array_values($browserCounts);
 
-    /* -------- 新增：读取 comment -------- */
-
-    $comment = '';
-    $author = '';
-    $time = '';
+    /* -------- 读取最近10条 comment -------- */
 
     $stmt = $pdo->prepare(
         "SELECT comment, author, created_at
          FROM comments
          WHERE report_id = 1
          ORDER BY created_at DESC
-         LIMIT 1"
+         LIMIT 10"
     );
 
     $stmt->execute();
-    $row = $stmt->fetch();
-
-    if($row){
-        $comment = $row['comment'];
-        $author = $row['author'];
-        $time = $row['created_at'];
-    }
+    $comments = $stmt->fetchAll();
 
 } catch (PDOException $e) {
     die("Database error: " . htmlspecialchars($e->getMessage()));
@@ -74,8 +64,6 @@ try {
     .card { background: white; padding: 24px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 1000px; }
     canvas { margin-top: 20px; }
 
-    /* -------- 新增 comment 样式 -------- */
-
     .comment-section{
         margin-top:40px;
         padding-top:20px;
@@ -86,15 +74,14 @@ try {
         background:#f1f5f9;
         padding:16px;
         border-radius:8px;
-        margin-top:10px;
+        margin-top:12px;
     }
 
     .comment-meta{
-        margin-top:8px;
+        margin-top:6px;
         font-size:13px;
         color:#666;
     }
-
   </style>
 </head>
 <body>
@@ -111,21 +98,28 @@ try {
   <p>This is a distribution of how many events are recorded through each browser</p>
   <canvas id="browserChart"></canvas>
 
-  <!-- 新增 Comment 区 -->
+  <!-- Comment Section -->
 
   <div class="comment-section">
 
-    <h2>Analyst Comment</h2>
+    <h2>Recent Analyst Comments</h2>
 
-    <?php if($comment): ?>
+    <?php if(!empty($comments)): ?>
 
-        <div class="comment-box">
-            <?= htmlspecialchars($comment) ?>
-            <div class="comment-meta">
-                Comment by <?= htmlspecialchars($author) ?>
-                | <?= htmlspecialchars($time) ?>
+        <?php foreach($comments as $c): ?>
+
+            <div class="comment-box">
+
+                <?= htmlspecialchars($c['comment']) ?>
+
+                <div class="comment-meta">
+                    Comment by <?= htmlspecialchars($c['author']) ?>
+                    | <?= htmlspecialchars($c['created_at']) ?>
+                </div>
+
             </div>
-        </div>
+
+        <?php endforeach; ?>
 
     <?php else: ?>
 
@@ -169,5 +163,6 @@ function getChartImage(){
   return document.getElementById('browserChart').toDataURL('image/png');
 }
 </script>
+
 </body>
 </html>
