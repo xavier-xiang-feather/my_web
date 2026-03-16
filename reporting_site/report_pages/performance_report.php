@@ -73,8 +73,7 @@ die("Database error: " . htmlspecialchars($e->getMessage()));
 <title>Performance Report</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-box-and-violin-plot"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-box-and-violin-plot@4"></script>
 <style>
 
 body{
