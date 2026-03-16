@@ -109,7 +109,7 @@ try {
 </div>
 
 <div class="card">
-  <h1>Dashboard</h1>
+  <h1>Accessed Browser Report</h1>
   <p>This is a distribution of how many events are recorded through each browser</p>
   <canvas id="browserChart"></canvas>
   <img id="chartImage" style="display:none;">

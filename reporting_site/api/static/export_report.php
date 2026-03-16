@@ -20,7 +20,6 @@ exit();
 }
 
 $reportId = $data['id'] ?? null;
-$chartImage = $data['chart'] ?? null;
 
 if(!$reportId){
 echo json_encode([
@@ -78,12 +77,6 @@ exit("unknown report");
 $html = file_get_contents($page);
 
 /* insert chart if provided */
-
-if($chartImage){
-$html .= "<img src='$chartImage' style='width:700px'>";
-}else{
-$html .= "<p>No chart available.</p>";
-}
 
 /* generate PDF */
 
