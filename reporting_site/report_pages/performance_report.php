@@ -6,63 +6,65 @@ $dbConfig = require __DIR__ . '/../includes/db.php';
 
 try {
 
-$dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
-$pdo = new PDO($dsn, $dbConfig['user'], $dbConfig['pass']);
+    $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
 
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-$pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+    $pdo = new PDO($dsn,$dbConfig['user'],$dbConfig['pass']);
 
-$sql = "
-SELECT raw_json
-FROM events
-WHERE raw_json LIKE '%\"kind\": \"performance\"%'
-ORDER BY id DESC
-LIMIT 200
-";
+    $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 
-$stmt = $pdo->query($sql);
-$rows = $stmt->fetchAll();
+    $sql = "SELECT raw_json FROM events WHERE raw_json LIKE '%performance%' ORDER BY id DESC LIMIT 200";
 
-$dns = [];
-$tcp = [];
-$ttfb = [];
-$dom = [];
-$load = [];
+    $stmt = $pdo->query($sql);
 
-foreach ($rows as $row) {
+    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-$data = json_decode($row['raw_json'], true);
+}catch(PDOException $e){
 
-if(!isset($data['payload']['timing'])) continue;
-
-$t = $data['payload']['timing'];
-
-if(isset($t['dnsLookup'])) $dns[] = (float)$t['dnsLookup'];
-if(isset($t['tcpConnect'])) $tcp[] = (float)$t['tcpConnect'];
-if(isset($t['ttfb'])) $ttfb[] = (float)$t['ttfb'];
-if(isset($t['domInteractive'])) $dom[] = (float)$t['domInteractive'];
-if(isset($t['loadEvent'])) $load[] = (float)$t['loadEvent'];
+    die("Database error: ".htmlspecialchars($e->getMessage()));
 
 }
 
-/* comments */
+$metrics = [
+"dnsLookup"=>[],
+"tcpConnect"=>[],
+"tlsHandshake"=>[],
+"ttfb"=>[],
+"download"=>[],
+"domInteractive"=>[],
+"domComplete"=>[],
+"loadEvent"=>[]
+];
 
-$stmt = $pdo->prepare("
-SELECT comment, author, created_at
-FROM comments
-WHERE report_id = 3
-ORDER BY created_at DESC
-LIMIT 10
-");
+foreach($rows as $row){
 
-$stmt->execute();
-$comments = $stmt->fetchAll();
+    $data = json_decode($row['raw_json'],true);
 
-} catch (PDOException $e) {
+    if(!isset($data['payload']['timing'])) continue;
 
-die("Database error: " . htmlspecialchars($e->getMessage()));
+    $timing = $data['payload']['timing'];
+
+    foreach($metrics as $key=>$arr){
+
+        if(isset($timing[$key])){
+            $metrics[$key][] = $timing[$key];
+        }
+
+    }
 
 }
+
+$avg = [];
+
+foreach($metrics as $key=>$values){
+
+    if(count($values)>0){
+        $avg[$key] = array_sum($values)/count($values);
+    }else{
+        $avg[$key] = 0;
+    }
+
+}
+
 ?>
 
 <!DOCTYPE html>
@@ -70,27 +72,35 @@ die("Database error: " . htmlspecialchars($e->getMessage()));
 <head>
 
 <meta charset="UTF-8">
+
 <title>Performance Report</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chartjs-chart-box-and-violin-plot@4"></script>
+
 <style>
 
 body{
-font-family: Arial;
+font-family:Arial;
 margin:30px;
-background:#f8fafc;
+background:#f5f7fb;
+}
+
+.container{
+max-width:1100px;
+margin:auto;
+background:white;
+padding:40px;
+border-radius:10px;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
 }
 
 .topbar{
 display:flex;
 justify-content:space-between;
-align-items:center;
-margin-bottom:40px;
+margin-bottom:20px;
 }
 
-.nav a{
-margin-right:14px;
+.topbar a{
 text-decoration:none;
 color:#2563eb;
 font-weight:bold;
@@ -100,39 +110,25 @@ font-weight:bold;
 padding:8px 14px;
 background:#dc2626;
 color:white;
-text-decoration:none;
 border-radius:6px;
-}
-
-.card{
-background:white;
-padding:24px;
-border-radius:10px;
-box-shadow:0 4px 12px rgba(0,0,0,0.08);
-max-width:1000px;
+text-decoration:none;
 }
 
 canvas{
-margin-top:20px;
+margin-top:30px;
 }
 
-.comment-section{
+.comment-box{
 margin-top:40px;
 padding-top:20px;
 border-top:1px solid #ddd;
 }
 
-.comment-box{
+.comment{
 background:#f1f5f9;
-padding:16px;
-border-radius:8px;
-margin-top:12px;
-}
-
-.comment-meta{
-margin-top:6px;
-font-size:13px;
-color:#666;
+padding:12px;
+margin-bottom:10px;
+border-radius:6px;
 }
 
 </style>
@@ -141,96 +137,134 @@ color:#666;
 
 <body>
 
+<div class="container">
+
 <div class="topbar">
 
-<div class="nav">
-<a href="/../manager_pages/report_dashboard.php">Dashboard</a>
-</div>
+<a href="/../manager_pages/data_dashboard.php">Dashboard</a>
 
-<a class="logout" href="/../logout.php">Log Out</a>
+<a class="logout" href="/logout.php">Log Out</a>
 
 </div>
-
-<div class="card">
 
 <h1>Performance Report</h1>
 
-<p>This report shows the distribution of page performance metrics.</p>
+<p>This report shows the average value of page performance metrics.</p>
 
 <canvas id="performanceChart"></canvas>
 
-<div class="comment-section">
+<div class="comment-box">
 
 <h2>Recent Analyst Comments</h2>
 
-<?php if(!empty($comments)): ?>
+<?php
 
-<?php foreach($comments as $c): ?>
+try{
 
-<div class="comment-box">
+$sql = "SELECT comment FROM comments WHERE category='performance' ORDER BY id DESC LIMIT 10";
 
-<?= htmlspecialchars($c['comment']) ?>
+$stmt = $pdo->query($sql);
 
-<div class="comment-meta">
+$comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
-Comment by <?= htmlspecialchars($c['author']) ?>
-|
-<?= htmlspecialchars($c['created_at']) ?>
+if(count($comments)==0){
 
-</div>
+echo "<div class='comment'>No comment available yet.</div>";
 
-</div>
+}else{
 
-<?php endforeach; ?>
+foreach($comments as $c){
+echo "<div class='comment'>".htmlspecialchars($c['comment'])."</div>";
+}
 
-<?php else: ?>
+}
 
-<div class="comment-box">
-No comment available yet.
-</div>
+}catch(PDOException $e){
 
-<?php endif; ?>
+echo "<div class='comment'>Error loading comments</div>";
+
+}
+
+?>
 
 </div>
 
 </div>
 
 <script>
-    const ctx = document.getElementById('performanceChart').getContext('2d');
+
+const labels = [
+"DNS Lookup",
+"TCP Connect",
+"TLS Handshake",
+"TTFB",
+"Download",
+"DOM Interactive",
+"DOM Complete",
+"Load Event"
+];
+
+const values = [
+<?= $avg['dnsLookup'] ?>,
+<?= $avg['tcpConnect'] ?>,
+<?= $avg['tlsHandshake'] ?>,
+<?= $avg['ttfb'] ?>,
+<?= $avg['download'] ?>,
+<?= $avg['domInteractive'] ?>,
+<?= $avg['domComplete'] ?>,
+<?= $avg['loadEvent'] ?>
+];
+
+const ctx = document.getElementById('performanceChart');
 
 new Chart(ctx,{
 
-type:'boxplot',
+type:'bar',
 
 data:{
-labels:['DNS','TCP','TTFB','DOM','LOAD'],
-
+labels:labels,
 datasets:[{
-label:'Performance Distribution',
-
-backgroundColor:'rgba(37,99,235,0.5)',
-borderColor:'rgba(37,99,235,1)',
-
-data:[
-{data: <?= json_encode($dns) ?>},
-{data: <?= json_encode($tcp) ?>},
-{data: <?= json_encode($ttfb) ?>},
-{data: <?= json_encode($dom) ?>},
-{data: <?= json_encode($load) ?>}
+label:'Average ms',
+data:values,
+backgroundColor:[
+'#3b82f6',
+'#22c55e',
+'#eab308',
+'#ef4444',
+'#8b5cf6',
+'#14b8a6',
+'#f97316',
+'#6366f1'
 ]
-
 }]
-
 },
 
 options:{
 responsive:true,
 plugins:{
-legend:{display:false}
+legend:{
+display:false
+}
+},
+scales:{
+y:{
+beginAtZero:true,
+title:{
+display:true,
+text:'Milliseconds'
+}
+}
 }
 }
 
 });
+
+function getChartImage(){
+
+return document.getElementById("performanceChart").toDataURL("image/png");
+
+}
+
 </script>
 
 </body>

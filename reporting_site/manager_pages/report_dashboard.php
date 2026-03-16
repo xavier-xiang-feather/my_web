@@ -188,7 +188,7 @@ id="chart<?= $report['id'] ?>"
 
 <?php if($report['category'] === 'performance'): ?>
 
-<option value="boxplot" selected>Box Plot</option>
+<option value="bar" selected>Histogram</option>
 
 <?php else: ?>
 
