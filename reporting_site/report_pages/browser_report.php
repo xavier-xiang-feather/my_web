@@ -33,6 +33,29 @@ try {
     $labels = array_keys($browserCounts);
     $counts = array_values($browserCounts);
 
+    /* -------- 新增：读取 comment -------- */
+
+    $comment = '';
+    $author = '';
+    $time = '';
+
+    $stmt = $pdo->prepare(
+        "SELECT comment, author, created_at
+         FROM comments
+         WHERE report_id = 1
+         ORDER BY created_at DESC
+         LIMIT 1"
+    );
+
+    $stmt->execute();
+    $row = $stmt->fetch();
+
+    if($row){
+        $comment = $row['comment'];
+        $author = $row['author'];
+        $time = $row['created_at'];
+    }
+
 } catch (PDOException $e) {
     die("Database error: " . htmlspecialchars($e->getMessage()));
 }
@@ -50,6 +73,28 @@ try {
     .logout { padding: 8px 14px; background: #dc2626; color: white; text-decoration: none; border-radius: 6px; }
     .card { background: white; padding: 24px; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.08); max-width: 1000px; }
     canvas { margin-top: 20px; }
+
+    /* -------- 新增 comment 样式 -------- */
+
+    .comment-section{
+        margin-top:40px;
+        padding-top:20px;
+        border-top:1px solid #ddd;
+    }
+
+    .comment-box{
+        background:#f1f5f9;
+        padding:16px;
+        border-radius:8px;
+        margin-top:10px;
+    }
+
+    .comment-meta{
+        margin-top:8px;
+        font-size:13px;
+        color:#666;
+    }
+
   </style>
 </head>
 <body>
@@ -65,6 +110,33 @@ try {
   <h1>Accessed Browser Report</h1>
   <p>This is a distribution of how many events are recorded through each browser</p>
   <canvas id="browserChart"></canvas>
+
+  <!-- 新增 Comment 区 -->
+
+  <div class="comment-section">
+
+    <h2>Analyst Comment</h2>
+
+    <?php if($comment): ?>
+
+        <div class="comment-box">
+            <?= htmlspecialchars($comment) ?>
+            <div class="comment-meta">
+                Comment by <?= htmlspecialchars($author) ?>
+                | <?= htmlspecialchars($time) ?>
+            </div>
+        </div>
+
+    <?php else: ?>
+
+        <div class="comment-box">
+            No comment available yet.
+        </div>
+
+    <?php endif; ?>
+
+  </div>
+
 </div>
 
 <script>
@@ -87,7 +159,7 @@ const chart = new Chart(ctx, {
   },
   options: {
     responsive: true,
-    animation: false, // 重要：关闭动画，确保导出时图片已画好
+    animation: false,
     scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
   }
 });
