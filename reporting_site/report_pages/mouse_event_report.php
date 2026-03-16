@@ -6,45 +6,50 @@ $dbConfig = require __DIR__ . '/../includes/db.php';
 
 $chartType = $_GET['chart'] ?? 'bar';
 
-try {
+try{
 
-$dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
-$pdo = new PDO($dsn,$dbConfig['user'],$dbConfig['pass']);
+$dsn="mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
+$pdo=new PDO($dsn,$dbConfig['user'],$dbConfig['pass']);
 
 $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);
 
-/* -------- behavior event statistics -------- */
+/* -------- mouse behavior statistics -------- */
 
 $sql = "
-SELECT event_type, COUNT(*) as count
+SELECT
+payload_json->>'$.activity.type' AS event_type,
+COUNT(*) AS count
 FROM events
+WHERE payload_json->>'$.activity.type' IS NOT NULL
 GROUP BY event_type
 ";
 
-$stmt = $pdo->query($sql);
-$rows = $stmt->fetchAll();
+$stmt=$pdo->query($sql);
+$rows=$stmt->fetchAll();
 
-$labels = [];
-$counts = [];
+$labels=[];
+$counts=[];
 
 foreach($rows as $r){
-$labels[] = $r['event_type'];
-$counts[] = $r['count'];
+
+$labels[]=$r['event_type'];
+$counts[]=$r['count'];
+
 }
 
 /* -------- comments -------- */
 
-$stmt = $pdo->prepare("
-SELECT comment, author, created_at
+$stmt=$pdo->prepare("
+SELECT comment,author,created_at
 FROM comments
-WHERE report_id = 2
+WHERE report_id=2
 ORDER BY created_at DESC
 LIMIT 10
 ");
 
 $stmt->execute();
-$comments = $stmt->fetchAll();
+$comments=$stmt->fetchAll();
 
 }catch(PDOException $e){
 
@@ -55,7 +60,7 @@ die("Database error: ".htmlspecialchars($e->getMessage()));
 ?>
 
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 
 <meta charset="UTF-8">
@@ -149,7 +154,7 @@ color:#666;
 
 <h1>Mouse Behavior Report</h1>
 
-<p>This report summarizes user interaction events recorded on the site.</p>
+<p>This report summarizes mouse and interaction events recorded on the site.</p>
 
 <div class="chart-container">
 <canvas id="mouseChart"></canvas>
@@ -193,16 +198,16 @@ No comment available yet.
 
 <script>
 
-const chartType = "<?= $chartType ?>";
+const chartType="<?= $chartType ?>";
 
-if(chartType === "pie"){
+if(chartType==="pie"){
 document.querySelector(".chart-container").classList.add("pie");
 }
 
-const labels = <?= json_encode($labels) ?>;
-const counts = <?= json_encode($counts) ?>;
+const labels=<?= json_encode($labels) ?>;
+const counts=<?= json_encode($counts) ?>;
 
-const ctx = document.getElementById("mouseChart").getContext("2d");
+const ctx=document.getElementById("mouseChart").getContext("2d");
 
 new Chart(ctx,{
 
@@ -214,7 +219,7 @@ labels:labels,
 
 datasets:[{
 
-label:"Event Count",
+label:"Mouse Events",
 
 data:counts,
 
@@ -231,14 +236,11 @@ backgroundColor:[
 },
 
 options:{
-
 responsive:true,
 animation:false,
-
-scales: chartType === "bar"
-? { y:{ beginAtZero:true, ticks:{precision:0} } }
+scales: chartType==="bar"
+? {y:{beginAtZero:true,ticks:{precision:0}}}
 : {}
-
 }
 
 });
