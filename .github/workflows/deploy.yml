@@ -43,6 +43,11 @@ jobs:
             --exclude ".github/" \
             collector_site/ \
             ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/collector.mrxijian.site/public_html/
+            
+      - name: Fix CGI permission
+        run: |
+          ssh ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }} \
+          "chmod +x /var/www/collector.mrxijian.site/public_html/cgi-bin/collect.cgi"
 
       #Deploy reporting site
       - name: Deploy reporting site
@@ -52,3 +57,4 @@ jobs:
             --exclude ".github/" \
             reporting_site/ \
             ${{ secrets.DO_USER }}@${{ secrets.DO_HOST }}:/var/www/reporting.mrxijian.site/public_html/
+  

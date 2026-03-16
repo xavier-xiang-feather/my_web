@@ -164,11 +164,36 @@ Export
 
 function exportReport(reportId){
 
-console.log("Export report:", reportId);
+let chartImage = null;
 
-/* future:
-fetch('/api/export_report.php')
-*/
+if(window.getChartImage){
+chartImage = window.getChartImage();
+}
+
+fetch("/api/static/export_report.php",{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+id:reportId,
+chart:chartImage
+})
+
+})
+.then(res=>res.json())
+.then(data=>{
+
+if(data.status==="success"){
+window.open(data.url);
+}else{
+alert(data.message);
+}
+
+});
 
 }
 

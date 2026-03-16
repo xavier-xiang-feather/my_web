@@ -142,6 +142,10 @@ new Chart(ctx, {
     }
   }
 });
+
+window.getChartImage = function(){
+return chart.toBase64Image();
+};
 </script>
 
 </body>
