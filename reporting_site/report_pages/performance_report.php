@@ -11,14 +11,19 @@ try {
     $pdo = new PDO($dsn,$dbConfig['user'],$dbConfig['pass']);
 
     $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);
 
-    $sql = "SELECT raw_json FROM events WHERE raw_json LIKE '%performance%' ORDER BY id DESC LIMIT 200";
+    $sql = "SELECT raw_json
+            FROM events
+            WHERE raw_json LIKE '%performance%'
+            ORDER BY id DESC
+            LIMIT 200";
 
     $stmt = $pdo->query($sql);
 
-    $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $rows = $stmt->fetchAll();
 
-}catch(PDOException $e){
+} catch(PDOException $e){
 
     die("Database error: ".htmlspecialchars($e->getMessage()));
 
@@ -37,42 +42,55 @@ $metrics = [
 
 foreach($rows as $row){
 
-    $data = json_decode($row['raw_json'],true);
+$data = json_decode($row['raw_json'],true);
 
-    if(!isset($data['payload']['timing'])) continue;
+if(!$data || !isset($data['payload']['timing'])) continue;
 
-    $timing = $data['payload']['timing'];
+$timing = $data['payload']['timing'];
 
-    foreach($metrics as $key=>$arr){
+foreach($metrics as $key=>$arr){
 
-        if(isset($timing[$key])){
-            $metrics[$key][] = $timing[$key];
-        }
-
-    }
+if(isset($timing[$key])){
+$metrics[$key][] = $timing[$key];
+}
 
 }
 
-$avg = [];
+}
+
+$avg=[];
 
 foreach($metrics as $key=>$values){
 
-    if(count($values)>0){
-        $avg[$key] = array_sum($values)/count($values);
-    }else{
-        $avg[$key] = 0;
-    }
+if(count($values)>0){
+$avg[$key]=array_sum($values)/count($values);
+}else{
+$avg[$key]=0;
+}
 
 }
+
+/* Load comments */
+
+$stmt=$pdo->prepare(
+"SELECT comment, author, created_at
+ FROM comments
+ WHERE report_id = 3
+ ORDER BY created_at DESC
+ LIMIT 10"
+);
+
+$stmt->execute();
+
+$comments=$stmt->fetchAll();
 
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 
 <meta charset="UTF-8">
-
 <title>Performance Report</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -80,27 +98,20 @@ foreach($metrics as $key=>$values){
 <style>
 
 body{
-font-family:Arial;
+font-family: Arial, sans-serif;
 margin:30px;
-background:#f5f7fb;
-}
-
-.container{
-max-width:1100px;
-margin:auto;
-background:white;
-padding:40px;
-border-radius:10px;
-box-shadow:0 4px 12px rgba(0,0,0,0.08);
+background:#f8fafc;
 }
 
 .topbar{
 display:flex;
 justify-content:space-between;
-margin-bottom:20px;
+align-items:center;
+margin-bottom:40px;
 }
 
-.topbar a{
+.nav a{
+margin-right:14px;
 text-decoration:none;
 color:#2563eb;
 font-weight:bold;
@@ -110,25 +121,40 @@ font-weight:bold;
 padding:8px 14px;
 background:#dc2626;
 color:white;
-border-radius:6px;
 text-decoration:none;
+border-radius:6px;
 }
 
-canvas{
-margin-top:30px;
+.card{
+background:white;
+padding:24px;
+border-radius:10px;
+box-shadow:0 4px 12px rgba(0,0,0,0.08);
+max-width:1000px;
 }
 
-.comment-box{
+.chart-container{
+width:100%;
+max-width:900px;
+}
+
+.comment-section{
 margin-top:40px;
 padding-top:20px;
 border-top:1px solid #ddd;
 }
 
-.comment{
+.comment-box{
 background:#f1f5f9;
-padding:12px;
-margin-bottom:10px;
-border-radius:6px;
+padding:16px;
+border-radius:8px;
+margin-top:12px;
+}
+
+.comment-meta{
+margin-top:6px;
+font-size:13px;
+color:#666;
 }
 
 </style>
@@ -137,55 +163,55 @@ border-radius:6px;
 
 <body>
 
-<div class="container">
-
 <div class="topbar">
 
-<a href="/../manager_pages/data_dashboard.php">Dashboard</a>
+<div class="nav">
+<a href="/../manager_pages/report_dashboard.php">Dashboard</a>
+</div>
 
-<a class="logout" href="/logout.php">Log Out</a>
+<a class="logout" href="/../logout.php">Log Out</a>
 
 </div>
+
+<div class="card">
 
 <h1>Performance Report</h1>
 
 <p>This report shows the average value of page performance metrics.</p>
 
+<div class="chart-container">
 <canvas id="performanceChart"></canvas>
+</div>
 
-<div class="comment-box">
+<div class="comment-section">
 
 <h2>Recent Analyst Comments</h2>
 
-<?php
+<?php if(!empty($comments)): ?>
 
-try{
+<?php foreach($comments as $c): ?>
 
-$sql = "SELECT comment FROM comments WHERE category='performance' ORDER BY id DESC LIMIT 10";
+<div class="comment-box">
 
-$stmt = $pdo->query($sql);
+<?= htmlspecialchars($c['comment']) ?>
 
-$comments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+<div class="comment-meta">
+Comment by <?= htmlspecialchars($c['author']) ?>
+|
+<?= htmlspecialchars($c['created_at']) ?>
+</div>
 
-if(count($comments)==0){
+</div>
 
-echo "<div class='comment'>No comment available yet.</div>";
+<?php endforeach; ?>
 
-}else{
+<?php else: ?>
 
-foreach($comments as $c){
-echo "<div class='comment'>".htmlspecialchars($c['comment'])."</div>";
-}
+<div class="comment-box">
+No comment available yet.
+</div>
 
-}
-
-}catch(PDOException $e){
-
-echo "<div class='comment'>Error loading comments</div>";
-
-}
-
-?>
+<?php endif; ?>
 
 </div>
 
@@ -193,7 +219,7 @@ echo "<div class='comment'>Error loading comments</div>";
 
 <script>
 
-const labels = [
+const labels=[
 "DNS Lookup",
 "TCP Connect",
 "TLS Handshake",
@@ -204,7 +230,7 @@ const labels = [
 "Load Event"
 ];
 
-const values = [
+const values=[
 <?= $avg['dnsLookup'] ?>,
 <?= $avg['tcpConnect'] ?>,
 <?= $avg['tlsHandshake'] ?>,
@@ -215,9 +241,9 @@ const values = [
 <?= $avg['loadEvent'] ?>
 ];
 
-const ctx = document.getElementById('performanceChart');
+const ctx=document.getElementById('performanceChart').getContext('2d');
 
-new Chart(ctx,{
+const chart=new Chart(ctx,{
 
 type:'bar',
 
@@ -227,24 +253,23 @@ datasets:[{
 label:'Average ms',
 data:values,
 backgroundColor:[
-'#3b82f6',
-'#22c55e',
-'#eab308',
-'#ef4444',
-'#8b5cf6',
-'#14b8a6',
-'#f97316',
-'#6366f1'
+'rgba(37,99,235,0.6)',
+'rgba(16,185,129,0.6)',
+'rgba(245,158,11,0.6)',
+'rgba(239,68,68,0.6)',
+'rgba(139,92,246,0.6)',
+'rgba(14,165,233,0.6)',
+'rgba(249,115,22,0.6)',
+'rgba(99,102,241,0.6)'
 ]
 }]
 },
 
 options:{
 responsive:true,
+animation:false,
 plugins:{
-legend:{
-display:false
-}
+legend:{display:false}
 },
 scales:{
 y:{
@@ -260,9 +285,7 @@ text:'Milliseconds'
 });
 
 function getChartImage(){
-
-return document.getElementById("performanceChart").toDataURL("image/png");
-
+return document.getElementById('performanceChart').toDataURL('image/png');
 }
 
 </script>

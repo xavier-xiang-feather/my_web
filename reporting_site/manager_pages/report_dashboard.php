@@ -237,7 +237,7 @@ function openReport(reportId, path){
 
     const chartType = select.value;
 
-    window.open(path + "?chart=" + chartType, "_blank");
+    window.location.href = path + "?chart=" + chartType;
 
 }
 
