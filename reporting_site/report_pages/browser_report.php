@@ -215,9 +215,7 @@ backgroundColor:[
 'rgba(139,92,246,0.6)',
 'rgba(14,165,233,0.6)',
 'rgba(156,163,175,0.6)'
-],
-
-borderWidth:1
+]
 
 }]
 
@@ -226,6 +224,12 @@ borderWidth:1
 options:{
 responsive:true,
 animation:false,
+
+plugins:{
+  legend:{
+    display:false
+  }
+},
 scales: chartType==='bar'
 ? {y:{beginAtZero:true,ticks:{precision:0}}}
 : {}

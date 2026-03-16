@@ -154,7 +154,7 @@ color:#666;
 
 <h1>Mouse Behavior Report</h1>
 
-<p>This report summarizes mouse and interaction events recorded on the site.</p>
+<p>This is the distribution of mouse interaction events recordedin the main site.</p>
 
 <div class="chart-container">
 <canvas id="mouseChart"></canvas>
@@ -218,19 +218,15 @@ data:{
 labels:labels,
 
 datasets:[{
-
 label:"Mouse Events",
-
 data:counts,
 
 backgroundColor:[
 "rgba(37,99,235,0.6)",
 "rgba(16,185,129,0.6)",
 "rgba(245,158,11,0.6)",
-"rgba(239,68,68,0.6)",
-"rgba(139,92,246,0.6)"
+"rgba(239,68,68,0.6)"
 ]
-
 }]
 
 },
@@ -238,6 +234,12 @@ backgroundColor:[
 options:{
 responsive:true,
 animation:false,
+
+plugins:{
+    legend:{
+        display:false
+    }
+},
 scales: chartType==="bar"
 ? {y:{beginAtZero:true,ticks:{precision:0}}}
 : {}
