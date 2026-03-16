@@ -186,8 +186,16 @@ id="chart<?= $report['id'] ?>"
 <?= canAccess($report['category'],$role) ? '' : 'disabled' ?>
 >
 
+<?php if($report['category'] === 'performance'): ?>
+
+<option value="boxplot" selected>Box Plot</option>
+
+<?php else: ?>
+
 <option value="bar" selected>Histogram</option>
 <option value="pie">Pie Chart</option>
+
+<?php endif; ?>
 
 </select>
 
