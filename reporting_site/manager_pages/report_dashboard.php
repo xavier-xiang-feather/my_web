@@ -293,10 +293,9 @@ function exportReport(reportId){
 
     const chartType = select.value;
 
-    window.open(report.path + "?chart=" + chartType + "&print=1","_blank");
+    window.open(report.path + "?chart=" + chartType + "&export=1","_blank");
 
 }
-
 </script>
 
 </body>

@@ -5,7 +5,7 @@ require_login();
 $dbConfig = require __DIR__ . '/../includes/db.php';
 
 $chartType = $_GET['chart'] ?? 'bar';
-$printMode = isset($_GET['print']);
+$exportMode = isset($_GET['export']);
 
 try {
     $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
@@ -59,6 +59,7 @@ try {
 <title>Accessed Browser Report</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 
@@ -137,7 +138,7 @@ color:#666;
 
 </div>
 
-<div class="card">
+<div class="card" id="reportContent">
 
 <h1>Accessed Browser Report</h1>
 
@@ -242,11 +243,26 @@ function getChartImage(){
 return document.getElementById('browserChart').toDataURL('image/png');
 }
 
-<?php if($printMode): ?>
+function exportPDF(){
+
+    const element = document.getElementById('reportContent');
+
+    const opt = {
+        margin: 0.5,
+        filename: 'browser_report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+
+<?php if($exportMode): ?>
 window.onload = function(){
     setTimeout(()=>{
-        window.print();
-    },500);
+        exportPDF();
+    },800);
 };
 <?php endif; ?>
 
