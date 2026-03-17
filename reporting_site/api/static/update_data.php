@@ -15,15 +15,11 @@ if(!$id){
 exit("invalid request");
 }
 
-/*
-dataset update logic
-*/
 
 switch($id){
 
 case 1:
 
-/* Event Logs dataset update */
 
 $url = "https://collector.mrxijian.site/import.php?token=xxjsld233";
 

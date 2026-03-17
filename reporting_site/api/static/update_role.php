@@ -26,7 +26,7 @@ if(!$id || !in_array($role,$allowed_roles)){
     exit("invalid request");
 }
 
-/* don't modify the root superadmin */
+// don't modify the root superadmin 
 if($id == 1){
     exit("cannot modify superadmin");
 }
