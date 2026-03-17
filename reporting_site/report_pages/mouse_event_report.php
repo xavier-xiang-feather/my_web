@@ -5,6 +5,7 @@ require_login();
 $dbConfig = require __DIR__ . '/../includes/db.php';
 
 $chartType = $_GET['chart'] ?? 'bar';
+$exportMode = isset($_GET['export']);
 
 try{
 
@@ -14,7 +15,7 @@ $pdo=new PDO($dsn,$dbConfig['user'],$dbConfig['pass']);
 $pdo->setAttribute(PDO::ATTR_ERRMODE,PDO::ERRMODE_EXCEPTION);
 $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);
 
-/* -------- mouse behavior statistics -------- */
+//get mouse event stats
 
 $sql = "
 SELECT
@@ -38,8 +39,7 @@ $counts[]=$r['count'];
 
 }
 
-/* -------- comments -------- */
-
+///comment
 $stmt=$pdo->prepare("
 SELECT comment,author,created_at
 FROM comments
@@ -67,6 +67,7 @@ die("Database error: ".htmlspecialchars($e->getMessage()));
 <title>Mouse Behavior Report</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 
@@ -150,7 +151,7 @@ color:#666;
 
 </div>
 
-<div class="card">
+<div class="card" id="reportContent">
 
 <h1>Mouse Behavior Report</h1>
 
@@ -162,7 +163,7 @@ color:#666;
 
 <div class="comment-section">
 
-<h2>Recent Analyst Comments</h2>
+<h2> Analyst Comments</h2>
 
 <?php if(!empty($comments)): ?>
 
@@ -246,6 +247,29 @@ scales: chartType==="bar"
 }
 
 });
+
+function exportPDF(){
+
+    const element = document.getElementById('reportContent');
+
+    const opt = {
+        margin: 0.5,
+        filename: 'mouse_event_report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+
+<?php if($exportMode): ?>
+window.onload = function(){
+    setTimeout(()=>{
+        exportPDF();
+    },800);
+};
+<?php endif; ?>
 
 </script>
 

@@ -59,6 +59,8 @@ try {
 <title>Accessed Browser Report</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<!-- use html2pdf.js for export feature -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
@@ -150,7 +152,7 @@ color:#666;
 
 <div class="comment-section">
 
-<h2>Recent Analyst Comments</h2>
+<h2> Analyst Comments</h2>
 
 <?php if(!empty($comments)): ?>
 

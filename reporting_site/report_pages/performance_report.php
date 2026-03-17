@@ -4,6 +4,8 @@ require_login();
 
 $dbConfig = require __DIR__ . '/../includes/db.php';
 
+$exportMode = isset($_GET['export']);
+
 try {
 
     $dsn = "mysql:host={$dbConfig['host']};dbname={$dbConfig['db']};charset={$dbConfig['charset']}";
@@ -94,6 +96,7 @@ $comments=$stmt->fetchAll();
 <title>Performance Report</title>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
 <style>
 
@@ -173,7 +176,7 @@ color:#666;
 
 </div>
 
-<div class="card">
+<div class="card" id="reportContent">
 
 <h1>Performance Report</h1>
 
@@ -185,7 +188,7 @@ color:#666;
 
 <div class="comment-section">
 
-<h2>Recent Analyst Comments</h2>
+<h2> Analyst Comments</h2>
 
 <?php if(!empty($comments)): ?>
 
@@ -287,6 +290,29 @@ text:'Milliseconds'
 function getChartImage(){
 return document.getElementById('performanceChart').toDataURL('image/png');
 }
+
+function exportPDF(){
+
+    const element = document.getElementById('reportContent');
+
+    const opt = {
+        margin: 0.5,
+        filename: 'performance_report.pdf',
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2 },
+        jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+
+<?php if($exportMode): ?>
+window.onload = function(){
+    setTimeout(()=>{
+        exportPDF();
+    },1000);
+};
+<?php endif; ?>
 
 </script>
 
